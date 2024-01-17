@@ -8,33 +8,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IBasicUserInfo } from './users.types';
 
-@Injectable()
-export class UsersService {
-  constructor(
-    private usersRepository: UsersRepository,
-    private emailService: EmailService
-  ) {}
-
-  // ============================================ Create user
-
-  async create(createUserDto: CreateUserDto): Promise<MessageResponse> {
-    await this.usersRepository.isExistCheck(
-      createUserDto.email,
-      createUserDto.phone
-    );
-
-    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-
-    const newUser = this.usersRepository.create({
-      ...createUserDto,
-      password: await hash(createUserDto.password, 10),
-      verificationCode,
-    });
-
-    await this.emailService.sendEmail({
-      to: createUserDto.email,
-      subject: 'Verify email',
-      html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 30px;">
+const verificationEmail = (
+  verificationCode: string
+) => `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 30px;">
                 <table style="max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">        
                   <tr>
                       <td style="text-align: center; padding: 20px 0;">
@@ -63,7 +39,35 @@ export class UsersService {
                       </td>
                   </tr>
                 </table>
-            </div>`,
+            </div>`;
+
+@Injectable()
+export class UsersService {
+  constructor(
+    private usersRepository: UsersRepository,
+    private emailService: EmailService
+  ) {}
+
+  // ============================================ Create user
+
+  async create(createUserDto: CreateUserDto): Promise<MessageResponse> {
+    await this.usersRepository.isExistCheck(
+      createUserDto.email,
+      createUserDto.phone
+    );
+
+    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+    const newUser = this.usersRepository.create({
+      ...createUserDto,
+      password: await hash(createUserDto.password, 10),
+      verificationCode,
+    });
+
+    await this.emailService.sendEmail({
+      to: createUserDto.email,
+      subject: 'Verify email',
+      html: verificationEmail(verificationCode),
     });
 
     await this.usersRepository.save(newUser);
@@ -92,6 +96,47 @@ export class UsersService {
     });
 
     return { ...user };
+  }
+
+  // ============================================ Send verification code
+
+  async sendVerify(email: string): Promise<MessageResponse> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      select: [
+        'id',
+        'email',
+        'phone',
+        'firstName',
+        'lastName',
+        'verify',
+        'verificationCode',
+      ],
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (user.verify && !user.verificationCode) {
+      throw new BadRequestException('User verification is complete');
+    } else {
+      const verificationCode = Math.floor(
+        1000 + Math.random() * 9000
+      ).toString();
+
+      await this.usersRepository.update(user.id, {
+        verificationCode,
+      });
+
+      await this.emailService.sendEmail({
+        to: email,
+        subject: 'Verify email',
+        html: verificationEmail(verificationCode),
+      });
+
+      return { message: 'Verification email sent' };
+    }
   }
 
   // ============================================ Update user tokens
