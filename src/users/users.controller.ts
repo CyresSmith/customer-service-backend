@@ -10,7 +10,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,15 +38,15 @@ export class UsersController {
   @Post('verify')
   @HttpCode(200)
   async verify(@Body() body: VerifyUserDto): Promise<IBasicUserInfoWithTokens> {
-    const userData = await this.usersService.verifyUser(body.code);
-    const tokenPair = await this.tokenService.generateNewTokenPair(userData);
-    await this.usersService.updateUserTokens(userData.id, tokenPair);
-    return { ...userData, ...tokenPair };
+    const user = await this.usersService.verifyUser(body.code);
+    const tokenPair = await this.tokenService.generateNewTokenPair(user);
+    await this.usersService.updateUserTokens(user.id, tokenPair);
+    return { user, ...tokenPair };
   }
 
   // ============================================ Current user
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AccessTokenGuard)
   @Get('current')
   @HttpCode(200)
   async getUserInfo(

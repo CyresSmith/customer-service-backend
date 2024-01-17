@@ -25,10 +25,36 @@ export class UsersRepository extends Repository<User> {
 
   // ============================================ Get user by id
 
-  async getUserById(id: number): Promise<IBasicUserInfo> {
+  async getById(id: number): Promise<IBasicUserInfo> {
     const user = await this.findOne({
       where: {
         id,
+      },
+      select: ['id', 'email', 'phone', 'firstName', 'lastName'],
+    });
+
+    return { ...user };
+  }
+
+  // ============================================ Get user by accessToken
+
+  async getByAccessToken(accessToken: string): Promise<IBasicUserInfo> {
+    const user = await this.findOne({
+      where: {
+        accessToken,
+      },
+      select: ['id', 'email', 'phone', 'firstName', 'lastName'],
+    });
+
+    return { ...user };
+  }
+
+  // ============================================ Get user by refreshToken
+
+  async getByRefreshToken(refreshToken: string): Promise<IBasicUserInfo> {
+    const user = await this.findOne({
+      where: {
+        refreshToken,
       },
       select: ['id', 'email', 'phone', 'firstName', 'lastName'],
     });

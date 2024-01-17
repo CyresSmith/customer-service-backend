@@ -102,7 +102,7 @@ export class UsersService {
   // ============================================ Get base user info
 
   async getBaseUserInfo(userId: number): Promise<IBasicUserInfo> {
-    return await this.usersRepository.getUserById(userId);
+    return await this.usersRepository.getById(userId);
   }
 
   // ============================================
@@ -112,7 +112,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.usersRepository.getUserById(id);
+    return this.usersRepository.getById(id);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

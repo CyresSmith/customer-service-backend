@@ -6,8 +6,10 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { LocalGuard } from 'src/common/guards/local.guard';
+import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
 import { TokenService } from 'src/token/token.service';
+import { ITokenPair } from 'src/token/token.types';
 import { UsersService } from 'src/users/users.service';
 import {
   IBasicUserInfo,
@@ -22,7 +24,7 @@ export class AuthController {
   ) {}
 
   // ============================================ Login user
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalGuard)
   @Post('login')
   @HttpCode(200)
   async login(
@@ -31,14 +33,19 @@ export class AuthController {
     const tokenPair = await this.tokenService.generateNewTokenPair(user);
     await this.usersService.updateUserTokens(user.id, tokenPair);
 
-    return { ...user, ...tokenPair };
+    return { user, ...tokenPair };
   }
 
   // ============================================ Refresh user
-  @UseGuards(AuthGuard('refresh'))
-  @HttpCode(200)
+  @UseGuards(RefreshTokenGuard)
   @Get('refresh')
-  async refresh(@Request() req: { user: IBasicUserInfo }) {
-    return this.tokenService.generateNewTokenPair(req.user);
+  @HttpCode(200)
+  async refresh(
+    @Request() { user }: { user: IBasicUserInfo }
+  ): Promise<ITokenPair> {
+    const tokenPair = await this.tokenService.generateNewTokenPair(user);
+    await this.usersService.updateUserTokens(user.id, tokenPair);
+
+    return tokenPair;
   }
 }
