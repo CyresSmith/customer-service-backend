@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
+import { MessageResponse } from 'src/common/types';
 import { EmailService } from 'src/email/email.service';
 import { ITokenPair } from 'src/token/token.types';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,7 +17,7 @@ export class UsersService {
 
   // ============================================ Create user
 
-  async create(createUserDto: CreateUserDto): Promise<{ message: string }> {
+  async create(createUserDto: CreateUserDto): Promise<MessageResponse> {
     await this.usersRepository.isExistCheck(
       createUserDto.email,
       createUserDto.phone
@@ -75,7 +76,7 @@ export class UsersService {
 
   // ============================================ Verify user
 
-  async verifyUser(verificationCode: string): Promise<IBasicUserInfo> {
+  async verify(verificationCode: string): Promise<IBasicUserInfo> {
     const user = await this.usersRepository.findOne({
       where: { verificationCode },
       select: ['id', 'email', 'phone', 'firstName', 'lastName'],
@@ -95,14 +96,25 @@ export class UsersService {
 
   // ============================================ Update user tokens
 
-  async updateUserTokens(userId: number, tokens: ITokenPair) {
+  async updateTokens(userId: number, tokens: ITokenPair) {
     await this.usersRepository.update(userId, tokens);
   }
 
   // ============================================ Get base user info
 
-  async getBaseUserInfo(userId: number): Promise<IBasicUserInfo> {
+  async getBaseInfo(userId: number): Promise<IBasicUserInfo> {
     return await this.usersRepository.getById(userId);
+  }
+
+  // ============================================Logout user
+
+  async logout(id: number): Promise<MessageResponse> {
+    await this.usersRepository.update(id, {
+      accessToken: '',
+      refreshToken: '',
+    });
+
+    return { message: 'Successfully logout' };
   }
 
   // ============================================

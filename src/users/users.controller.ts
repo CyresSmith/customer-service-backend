@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -29,8 +30,8 @@ export class UsersController {
 
   @Post('register')
   @HttpCode(201)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<MessageResponse> {
+    return await this.usersService.create(createUserDto);
   }
 
   // ============================================ Verify user
@@ -38,9 +39,9 @@ export class UsersController {
   @Post('verify')
   @HttpCode(200)
   async verify(@Body() body: VerifyUserDto): Promise<IBasicUserInfoWithTokens> {
-    const user = await this.usersService.verifyUser(body.code);
+    const user = await this.usersService.verify(body.code);
     const tokenPair = await this.tokenService.generateNewTokenPair(user);
-    await this.usersService.updateUserTokens(user.id, tokenPair);
+    await this.usersService.updateTokens(user.id, tokenPair);
     return { user, ...tokenPair };
   }
 
@@ -52,7 +53,7 @@ export class UsersController {
   async getUserInfo(
     @Request() req: { user: IBasicUserInfo }
   ): Promise<IBasicUserInfo> {
-    return await this.usersService.getBaseUserInfo(req.user.id);
+    return await this.usersService.getBaseInfo(req.user.id);
   }
 
   // ============================================
