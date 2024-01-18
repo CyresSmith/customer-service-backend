@@ -9,8 +9,6 @@ import {
 } from 'class-validator';
 import { IsPassword } from 'src/common/validators';
 
-const passwordRegExp = /^(?=.*[A-Z])(?=.*\d).{6,20}$/;
-
 export class CreateUserDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })

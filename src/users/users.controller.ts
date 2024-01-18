@@ -10,9 +10,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RestorePasswordDto } from './dto/restore-password.dto';
+import { SendVerifyCodeDto } from './dto/send-veryfi-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { VerifyUserDto } from './dto/verify-user.dto';
 import { UsersService } from './users.service';
@@ -29,8 +32,8 @@ export class UsersController {
 
   @Post('register')
   @HttpCode(201)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<MessageResponse> {
+    return await this.usersService.create(createUserDto);
   }
 
   // ============================================ Verify user
@@ -38,21 +41,51 @@ export class UsersController {
   @Post('verify')
   @HttpCode(200)
   async verify(@Body() body: VerifyUserDto): Promise<IBasicUserInfoWithTokens> {
-    const userData = await this.usersService.verifyUser(body.code);
-    const tokenPair = await this.tokenService.generateNewTokenPair(userData);
-    await this.usersService.updateUserTokens(userData.id, tokenPair);
-    return { ...userData, ...tokenPair };
+    const user = await this.usersService.verify(body.code);
+    const tokenPair = await this.tokenService.generateNewTokenPair(user);
+    await this.usersService.updateTokens(user.id, tokenPair);
+    return { user, ...tokenPair };
+  }
+
+  // ============================================ Send verify code
+
+  @Post('send-verify-code')
+  @HttpCode(200)
+  async sendVerifyCode(
+    @Body() body: SendVerifyCodeDto
+  ): Promise<MessageResponse> {
+    return await this.usersService.sendVerify(body.email);
   }
 
   // ============================================ Current user
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AccessTokenGuard)
   @Get('current')
   @HttpCode(200)
   async getUserInfo(
     @Request() req: { user: IBasicUserInfo }
   ): Promise<IBasicUserInfo> {
-    return await this.usersService.getBaseUserInfo(req.user.id);
+    return await this.usersService.getBaseInfo(req.user.id);
+  }
+
+  // ============================================ Password restore email
+
+  @Post('/password-restore-email')
+  @HttpCode(200)
+  async sendResetLink(
+    @Body() body: SendVerifyCodeDto
+  ): Promise<MessageResponse> {
+    return await this.usersService.sendResetLink(body.email);
+  }
+
+  // ============================================ Restore password
+
+  @Post('/restore-password')
+  @HttpCode(200)
+  async restorePassword(
+    @Body() body: RestorePasswordDto
+  ): Promise<MessageResponse> {
+    return await this.usersService.restorePassword(body);
   }
 
   // ============================================
