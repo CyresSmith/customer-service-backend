@@ -1,3 +1,11 @@
+export { Action } from './action.entity';
+export { Activity } from './activity.entity';
+export { Category } from './category.entity';
 export { Client } from './client.entity';
 export { Company } from './company.entity';
+export { Employee } from './employee.entity';
+export { Product } from './product.entity';
+export { Resource } from './resource.entity';
+export { Schedule } from './schedule.entity';
+export { Service } from './service.entity';
 export { User } from './user.entity';

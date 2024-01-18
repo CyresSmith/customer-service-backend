@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Employee } from './employee.entity';
 
 @Entity({ name: 'User' })
 export class User {
@@ -25,6 +27,9 @@ export class User {
 
   @Column({ default: 'user' })
   role: string;
+
+  @OneToMany(() => Employee, employee => employee.user)
+  employees: Employee[];
 
   @Column({ nullable: false })
   password: string;
