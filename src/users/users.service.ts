@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
 import { MessageResponse } from 'src/common/types';
 import { EmailService } from 'src/email/email.service';
 import { ITokenPair } from 'src/token/token.types';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RestorePasswordDto } from './dto/restore-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IBasicUserInfo } from './users.types';
 
@@ -45,8 +47,23 @@ const verificationEmail = (
 export class UsersService {
   constructor(
     private usersRepository: UsersRepository,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private configService: ConfigService
   ) {}
+
+  // ============================================ Generate random number
+
+  generateRandomNumber(length: number): string {
+    let result = '';
+    const characters = '0123456789';
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters[randomIndex];
+    }
+
+    return result;
+  }
 
   // ============================================ Create user
 
@@ -56,7 +73,7 @@ export class UsersService {
       createUserDto.phone
     );
 
-    const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const verificationCode = this.generateRandomNumber(4);
 
     const newUser = this.usersRepository.create({
       ...createUserDto,
@@ -121,9 +138,7 @@ export class UsersService {
     if (user.verify && !user.verificationCode) {
       throw new BadRequestException('User verification is complete');
     } else {
-      const verificationCode = Math.floor(
-        1000 + Math.random() * 9000
-      ).toString();
+      const verificationCode = this.generateRandomNumber(4);
 
       await this.usersRepository.update(user.id, {
         verificationCode,
@@ -137,6 +152,56 @@ export class UsersService {
 
       return { message: 'Verification email sent' };
     }
+  }
+
+  // ============================================ Send reset password link
+
+  async sendResetLink(email: string) {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User nor found');
+    }
+
+    const verificationCode = this.generateRandomNumber(8);
+
+    await this.usersRepository.update({ email }, { verificationCode });
+
+    return await this.emailService.sendEmail({
+      to: email,
+      subject: 'Reset password',
+      html: `<a href="${this.configService.get<string>('FRONTEND_URL')}?email=${encodeURIComponent(email)}&key=${encodeURIComponent(verificationCode)}">Reset my password</a>`,
+    });
+  }
+
+  // ============================================ Restore password
+
+  async restorePassword({
+    email,
+    password,
+    verificationCode,
+  }: RestorePasswordDto): Promise<MessageResponse> {
+    email = decodeURIComponent(email);
+    verificationCode = decodeURIComponent(verificationCode);
+
+    const userExist = await this.usersRepository.findOne({
+      where: { email, verificationCode },
+    });
+
+    if (!userExist) {
+      throw new BadRequestException('User not found');
+    }
+
+    const newPassword = hash(password, 10);
+
+    await this.usersRepository.update(
+      { email },
+      { password: newPassword, verificationCode: '' }
+    );
+
+    return { message: 'Password successfully updated' };
   }
 
   // ============================================ Update user tokens

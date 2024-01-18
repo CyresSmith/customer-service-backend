@@ -14,6 +14,7 @@ import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RestorePasswordDto } from './dto/restore-password.dto';
 import { SendVerifyCodeDto } from './dto/send-veryfi-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { VerifyUserDto } from './dto/verify-user.dto';
@@ -65,6 +66,26 @@ export class UsersController {
     @Request() req: { user: IBasicUserInfo }
   ): Promise<IBasicUserInfo> {
     return await this.usersService.getBaseInfo(req.user.id);
+  }
+
+  // ============================================ Password restore email
+
+  @Post('/password-restore-email')
+  @HttpCode(200)
+  async sendResetLink(
+    @Body() body: SendVerifyCodeDto
+  ): Promise<MessageResponse> {
+    return await this.usersService.sendResetLink(body.email);
+  }
+
+  // ============================================ Restore password
+
+  @Post('/restore-password')
+  @HttpCode(200)
+  async restorePassword(
+    @Body() body: RestorePasswordDto
+  ): Promise<MessageResponse> {
+    return await this.usersService.restorePassword(body);
   }
 
   // ============================================
