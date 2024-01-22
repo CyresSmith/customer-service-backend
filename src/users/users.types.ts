@@ -1,4 +1,4 @@
-import { User } from 'db/entities';
+import { Company, User } from 'db/entities';
 import { ITokenPair } from 'src/token/token.types';
 
 export interface IBasicUserInfo
@@ -6,4 +6,9 @@ export interface IBasicUserInfo
 
 export interface IBasicUserInfoWithTokens extends ITokenPair {
   user: IBasicUserInfo;
+}
+
+export interface IBasicUserInfoWithTokensAndCompanies
+  extends IBasicUserInfoWithTokens {
+  companies: Company[];
 }

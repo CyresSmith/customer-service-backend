@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { User } from 'db/entities';
+import { Employee, User } from 'db/entities';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DataSource, Repository } from 'typeorm';
 

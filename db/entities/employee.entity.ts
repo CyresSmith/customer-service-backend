@@ -1,4 +1,4 @@
-import { EmployeeStatus, JobTitle } from 'src/common/types';
+import { EmployeeStatus, JobTitle, Roles } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -29,7 +29,7 @@ export class Employee {
   @Index()
   user: User;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   jobTitle: JobTitle;
 
   @ManyToOne(() => Category, category => category.employees)
@@ -45,6 +45,9 @@ export class Employee {
 
   @Column({ default: 'working' })
   status: EmployeeStatus;
+
+  @Column({ nullable: false, default: 'user' })
+  role: Roles;
 
   @ManyToOne(() => Company, company => company.id, {
     onDelete: 'CASCADE',

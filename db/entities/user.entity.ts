@@ -25,9 +25,6 @@ export class User {
   @Column({ nullable: true, default: '' })
   lastName: string;
 
-  @Column({ default: 'user' })
-  role: string;
-
   @OneToMany(() => Employee, employee => employee.user)
   employees: Employee[];
 

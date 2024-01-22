@@ -1,22 +1,56 @@
 import { Injectable } from '@nestjs/common';
-import { CompaniesRepository } from 'src/common/repositories';
+import { Company, User } from 'db/entities';
+import { RolesEnum } from 'src/common/enums';
+import {
+  CompaniesRepository,
+  EmployeesRepository,
+} from 'src/common/repositories';
+import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
 export class CompaniesService {
-  constructor(private companyRepository: CompaniesRepository) {}
+  constructor(
+    private companyRepository: CompaniesRepository,
+    private employeesRepository: EmployeesRepository
+  ) {}
 
-  create(createCompanyDto: CreateCompanyDto) {
-    return 'This action adds a new company';
+  // ============================================ Create company
+
+  async create(
+    createCompanyDto: CreateCompanyDto,
+    owner: number
+  ): Promise<Company> {
+    const { name, phones } = createCompanyDto;
+
+    await this.companyRepository.isExistCheck(name, phones);
+
+    const newCompany = this.companyRepository.create({
+      ...createCompanyDto,
+    });
+
+    const company = await this.companyRepository.save(newCompany);
+
+    const newEmployee = this.employeesRepository.create({
+      user: owner as DeepPartial<User>,
+      role: RolesEnum.OWNER,
+      company: company.id as DeepPartial<Company>,
+    });
+
+    await this.employeesRepository.save(newEmployee);
+
+    return company;
   }
+
+  // ============================================
 
   findAll() {
     return `This action returns all companies`;
   }
 
   findOne(id: number) {
-    return this.companyRepository.getCompanyById(id);
+    return this.companyRepository.getById(id);
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {

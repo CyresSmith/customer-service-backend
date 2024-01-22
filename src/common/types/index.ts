@@ -4,17 +4,17 @@ export type MessageResponse = {
 
 export interface IWorkTime {
   from: number;
-  to: string;
+  to: number;
 }
 
 export interface IWorkingHours {
-  Monday: IWorkTime;
-  Tuesday: IWorkTime;
-  Wednesday: IWorkTime;
-  Thursday: IWorkTime;
-  Friday: IWorkTime;
-  Saturday: IWorkTime;
-  Sunday: IWorkTime;
+  monday: IWorkTime;
+  tuesday: IWorkTime;
+  wednesday: IWorkTime;
+  thursday: IWorkTime;
+  friday: IWorkTime;
+  saturday: IWorkTime;
+  sunday: IWorkTime;
 }
 
 export type JobTitle = 'admin' | 'master';
@@ -28,3 +28,5 @@ export type ActionType = 'sale' | 'service';
 export type EmployeeStatus = 'working' | 'fired';
 
 export type Gender = 'male' | 'female' | 'other';
+
+export type Roles = 'user' | 'owner' | 'admin' | 'employee';

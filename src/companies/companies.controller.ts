@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { Company } from 'db/entities';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { IBasicUserInfo } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -7,10 +21,19 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
-  @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companiesService.create(createCompanyDto);
+  // ============================================ Register company
+
+  @UseGuards(AccessTokenGuard)
+  @Post('register')
+  @HttpCode(201)
+  async create(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @Request() { user }: { user: IBasicUserInfo }
+  ): Promise<Company> {
+    return await this.companiesService.create(createCompanyDto, user.id);
   }
+
+  // ============================================
 
   @Get()
   findAll() {

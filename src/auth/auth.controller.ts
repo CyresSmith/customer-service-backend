@@ -9,20 +9,22 @@ import {
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { LocalGuard } from 'src/common/guards/local.guard';
 import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
+import { CompaniesRepository } from 'src/common/repositories';
 import { MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { ITokenPair } from 'src/token/token.types';
 import { UsersService } from 'src/users/users.service';
 import {
   IBasicUserInfo,
-  IBasicUserInfoWithTokens,
+  IBasicUserInfoWithTokensAndCompanies,
 } from 'src/users/users.types';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly tokenService: TokenService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly companiesRepository: CompaniesRepository
   ) {}
 
   // ============================================ Login user
@@ -31,11 +33,18 @@ export class AuthController {
   @HttpCode(200)
   async login(
     @Request() { user }: { user: IBasicUserInfo }
-  ): Promise<IBasicUserInfoWithTokens> {
+  ): Promise<IBasicUserInfoWithTokensAndCompanies> {
     const tokenPair = await this.tokenService.generateNewTokenPair(user);
     await this.usersService.updateTokens(user.id, tokenPair);
 
-    return { user, ...tokenPair };
+    const companies = await this.companiesRepository.find({
+      where: {
+        employees: { user: { id: user.id } },
+      },
+      select: ['name', 'id'],
+    });
+
+    return { user, companies, ...tokenPair };
   }
 
   // ============================================ Refresh user

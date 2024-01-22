@@ -26,7 +26,7 @@ export class Company {
   name: string;
 
   @Column({ type: 'jsonb', nullable: false })
-  phone: string[];
+  phones: string[];
 
   @Column({ nullable: false })
   address: string;
@@ -54,7 +54,10 @@ export class Company {
   @Column({ nullable: true })
   avatar: string;
 
-  @OneToMany(() => Employee, employee => employee.company)
+  @OneToMany(() => Employee, employee => employee.company, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   employees: Employee[];
 
   @ManyToMany(() => Category, category => category.companies)
