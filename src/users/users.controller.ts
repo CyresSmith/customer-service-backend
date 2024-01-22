@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
-import { MessageResponse } from 'src/common/types';
+import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
@@ -32,7 +32,9 @@ export class UsersController {
 
   @Post('register')
   @HttpCode(201)
-  async create(@Body() createUserDto: CreateUserDto): Promise<MessageResponse> {
+  async create(
+    @Body() createUserDto: CreateUserDto
+  ): Promise<ICreateUserResponse> {
     return await this.usersService.create(createUserDto);
   }
 

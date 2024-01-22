@@ -2,19 +2,20 @@ import {
   IsEmail,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 import { IsPassword } from 'src/common/validators';
+import { phoneRegExp } from 'src/common/validators/phone-array.validator';
 
 export class CreateUserDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
-  @IsPhoneNumber('UA', { message: 'Invalid phone number format' })
+  @Matches(phoneRegExp, { message: 'Invalid phone number' })
   @IsNotEmpty({ message: 'Phone is required' })
   phone: string;
 

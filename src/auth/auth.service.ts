@@ -13,7 +13,10 @@ export class AuthService {
 
   async validateUser({ email, password }: LoginDto): Promise<IBasicUserInfo> {
     const user = await this.usersRepository.findOne({
-      where: { email },
+      relations: ['employees', 'employees.company'],
+      where: {
+        email,
+      },
     });
 
     if (!user || !user.password) {

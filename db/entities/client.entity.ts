@@ -1,3 +1,4 @@
+import { Gender } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -22,6 +23,21 @@ export class Client {
 
   @Column({ nullable: true, default: '' })
   lastName: string;
+
+  @Column({ nullable: true, default: '' })
+  avatar: string;
+
+  @Column({ nullable: true, default: '' })
+  birthday: string;
+
+  @Column({ nullable: true, default: '' })
+  gender: Gender;
+
+  @Column({ type: 'int', nullable: true, default: 0 })
+  discount: number;
+
+  @Column({ nullable: true, default: '' })
+  comment: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
