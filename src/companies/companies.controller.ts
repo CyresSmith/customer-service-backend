@@ -79,6 +79,7 @@ export class CompaniesController {
 
   // ============================================ Get Company by id
 
+  @UseGuards(AccessTokenGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.companiesService.findOne(id);

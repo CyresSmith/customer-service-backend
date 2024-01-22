@@ -1,5 +1,5 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
-import { JobTitle } from 'src/common/types';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { JobTitle, Role } from 'src/common/types';
 
 export class EmployeeDto {
   @IsString()
@@ -10,4 +10,7 @@ export class EmployeeDto {
 
   @IsBoolean()
   provider: boolean;
+
+  @IsOptional()
+  role: Role;
 }

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Client } from 'db/entities';
+import { Category } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
-export class ClientsRepository extends Repository<Client> {
+export class CategoriesRepository extends Repository<Category> {
   constructor(private readonly ds: DataSource) {
-    super(Client, ds.createEntityManager());
+    super(Category, ds.createEntityManager());
   }
 
-  getById(id: number): Promise<Client> {
+  getById(id: number): Promise<Category> {
     return this.findOne({
       where: {
         id,

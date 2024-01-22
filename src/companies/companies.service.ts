@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Category, Company, User } from 'db/entities';
+import { Category, Company, Employee, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
   CompaniesRepository,
@@ -51,9 +51,9 @@ export class CompaniesService {
     userId: number,
     employeeData: EmployeeDto,
     companyId: number
-  ): Promise<any> {
+  ): Promise<Employee> {
     const existEmployee =
-      this.employeesRepository.isEmployeeUserExistCheck(userId);
+      await this.employeesRepository.isEmployeeUserExistCheck(userId);
 
     if (existEmployee) {
       throw new BadRequestException('Employee for this user is already exist');
@@ -75,7 +75,7 @@ export class CompaniesService {
     user: IBasicUserInfo,
     employeeData: EmployeeDto,
     companyId: number
-  ): Promise<any> {
+  ): Promise<Employee> {
     const newEmployee = this.employeesRepository.create({
       ...employeeData,
       category: employeeData.category as DeepPartial<Category>,
