@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { Company, User } from 'db/entities';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Category, Company, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
   CompaniesRepository,
   EmployeesRepository,
 } from 'src/common/repositories';
+import { EmployeeDto } from 'src/employees/dto/employee.dto';
+import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -41,6 +43,47 @@ export class CompaniesService {
     await this.employeesRepository.save(newEmployee);
 
     return company;
+  }
+
+  // ============================================ Add exist user employee
+
+  async addExistUserEmployee(
+    userId: number,
+    employeeData: EmployeeDto,
+    companyId: number
+  ): Promise<any> {
+    const existEmployee =
+      this.employeesRepository.isEmployeeUserExistCheck(userId);
+
+    if (existEmployee) {
+      throw new BadRequestException('Employee for this user is already exist');
+    }
+
+    const newEmployee = this.employeesRepository.create({
+      ...employeeData,
+      category: employeeData.category as DeepPartial<Category>,
+      user: userId as DeepPartial<User>,
+      company: companyId as DeepPartial<Company>,
+    });
+
+    return await this.employeesRepository.save(newEmployee);
+  }
+
+  // ============================================ Add new user employee
+
+  async addNewUserEmployee(
+    user: IBasicUserInfo,
+    employeeData: EmployeeDto,
+    companyId: number
+  ): Promise<any> {
+    const newEmployee = this.employeesRepository.create({
+      ...employeeData,
+      category: employeeData.category as DeepPartial<Category>,
+      user,
+      company: companyId as DeepPartial<Company>,
+    });
+
+    return await this.employeesRepository.save(newEmployee);
   }
 
   // ============================================

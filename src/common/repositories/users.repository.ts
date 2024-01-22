@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from 'db/entities';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DataSource, Repository } from 'typeorm';
@@ -11,16 +11,16 @@ export class UsersRepository extends Repository<User> {
 
   // ============================================ Is exist check
 
-  async isExistCheck(email: string, phone: string): Promise<boolean> {
-    const existUsers = await this.find({
+  async isExistCheck(email: string, phone: string): Promise<number | null> {
+    const existUser = await this.findOne({
       where: [{ email }, { phone }],
     });
 
-    if (existUsers.length > 0) {
-      throw new BadRequestException('User already exist');
+    if (existUser && existUser.id) {
+      return existUser.id;
     }
 
-    return false;
+    return null;
   }
 
   // ============================================ Get user by id

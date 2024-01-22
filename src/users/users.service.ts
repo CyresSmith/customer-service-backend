@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
-import { MessageResponse } from 'src/common/types';
+import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { EmailService } from 'src/email/email.service';
 import { ITokenPair } from 'src/token/token.types';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -67,11 +67,15 @@ export class UsersService {
 
   // ============================================ Create user
 
-  async create(createUserDto: CreateUserDto): Promise<MessageResponse> {
-    await this.usersRepository.isExistCheck(
+  async create(createUserDto: CreateUserDto): Promise<ICreateUserResponse> {
+    const existUserId = await this.usersRepository.isExistCheck(
       createUserDto.email,
       createUserDto.phone
     );
+
+    if (existUserId) {
+      throw new BadRequestException('User already exist');
+    }
 
     const verificationCode = this.generateRandomNumber(4);
 
@@ -87,11 +91,18 @@ export class UsersService {
       html: verificationEmail(verificationCode),
     });
 
-    await this.usersRepository.save(newUser);
+    const user = await this.usersRepository.save(newUser);
 
     return {
       message:
         'Verification code send on Your email, please confirm registration!',
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     };
   }
 

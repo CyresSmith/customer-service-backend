@@ -4,14 +4,21 @@ import { Company } from 'db/entities';
 import {
   CompaniesRepository,
   EmployeesRepository,
+  UsersRepository,
 } from 'src/common/repositories';
+import { UsersModule } from 'src/users/users.module';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company])],
+  imports: [TypeOrmModule.forFeature([Company]), UsersModule],
   controllers: [CompaniesController],
-  providers: [CompaniesRepository, CompaniesService, EmployeesRepository],
+  providers: [
+    CompaniesRepository,
+    CompaniesService,
+    EmployeesRepository,
+    UsersRepository,
+  ],
   exports: [CompaniesService],
 })
 export class CompaniesModule {}

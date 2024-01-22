@@ -8,6 +8,14 @@ export class EmployeesRepository extends Repository<Employee> {
     super(Employee, ds.createEntityManager());
   }
 
+  isEmployeeUserExistCheck(userId: number): Promise<Employee> {
+    return this.findOne({
+      where: {
+        user: { id: userId },
+      },
+    });
+  }
+
   getById(id: number): Promise<Employee> {
     return this.findOne({
       where: {

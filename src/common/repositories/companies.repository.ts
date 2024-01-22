@@ -41,8 +41,28 @@ export class CompaniesRepository extends Repository<Company> {
 
   getById(id: number): Promise<Company> {
     return this.findOne({
+      relations: ['employees', 'employees.user', 'employees.category'],
       where: {
         id,
+      },
+      select: {
+        employees: {
+          id: true,
+          jobTitle: true,
+          role: true,
+          status: true,
+          category: {
+            id: true,
+            name: true,
+          },
+          user: {
+            id: true,
+            email: true,
+            phone: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
       },
     });
   }

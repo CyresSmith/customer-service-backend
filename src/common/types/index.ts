@@ -1,6 +1,12 @@
+import { IBasicUserInfo } from 'src/users/users.types';
+
 export type MessageResponse = {
   message: string;
 };
+
+export interface ICreateUserResponse extends MessageResponse {
+  user: IBasicUserInfo;
+}
 
 export interface IWorkTime {
   from: number;
