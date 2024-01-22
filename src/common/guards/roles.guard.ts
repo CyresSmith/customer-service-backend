@@ -20,7 +20,7 @@ export class RolesGuard implements CanActivate {
 
     if (user && user?.employees && params?.companyId) {
       const employee = user?.employees?.find(
-        employee => employee?.company?.id === Number(params?.companyId)
+        employee => employee?.company?.id === +params?.companyId
       );
 
       return this.matchRoles(roles, employee.role);

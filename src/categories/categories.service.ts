@@ -1,16 +1,59 @@
 import { Injectable } from '@nestjs/common';
+import {
+  CategoriesRepository,
+  CompaniesRepository,
+} from 'src/common/repositories';
+import { IBasicCategoryInfo } from './categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(
+    private readonly categoriesRepository: CategoriesRepository,
+    private readonly companyRepository: CompaniesRepository
+  ) {}
+
+  // ============================================ Create category
+
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    companyId: number
+  ): Promise<IBasicCategoryInfo> {
+    const company = await this.companyRepository.getById(companyId);
+
+    const newCategory = this.categoriesRepository.create({
+      ...createCategoryDto,
+      companies: [company],
+    });
+
+    const category = await this.categoriesRepository.save(newCategory);
+
+    return { id: category.id, name: category.name, type: category.type };
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  // ============================================ Get all categories
+
+  async findAllByCompanyId(companyId: number): Promise<IBasicCategoryInfo[]> {
+    return await this.categoriesRepository.find({
+      where: {
+        companies: {
+          id: companyId,
+        },
+      },
+      select: ['id', 'name', 'type'],
+    });
   }
+
+  // ============================================ Get all categories
+
+  async findAll(): Promise<IBasicCategoryInfo[]> {
+    return await this.categoriesRepository.find({
+      select: ['id', 'name', 'type'],
+    });
+  }
+
+  // ============================================
 
   findOne(id: number) {
     return `This action returns a #${id} category`;
