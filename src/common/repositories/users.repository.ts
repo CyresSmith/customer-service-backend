@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Employee, User } from 'db/entities';
+import { User } from 'db/entities';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DataSource, Repository } from 'typeorm';
 
@@ -40,13 +40,14 @@ export class UsersRepository extends Repository<User> {
 
   async getByAccessToken(accessToken: string): Promise<IBasicUserInfo> {
     const user = await this.findOne({
+      relations: ['employees', 'employees.company'],
       where: {
         accessToken,
       },
-      select: ['id', 'email', 'phone', 'firstName', 'lastName'],
+      select: ['id', 'email', 'phone', 'firstName', 'lastName', 'employees'],
     });
 
-    return { ...user };
+    return user;
   }
 
   // ============================================ Get user by refreshToken

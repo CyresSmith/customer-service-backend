@@ -29,4 +29,4 @@ export type EmployeeStatus = 'working' | 'fired';
 
 export type Gender = 'male' | 'female' | 'other';
 
-export type Roles = 'user' | 'owner' | 'admin' | 'employee';
+export type Role = 'user' | 'owner' | 'admin' | 'employee';
