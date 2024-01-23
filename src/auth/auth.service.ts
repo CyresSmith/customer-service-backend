@@ -34,6 +34,7 @@ export class AuthService {
       phone: user.phone,
       firstName: user.firstName,
       lastName: user.lastName,
+      verify: user.verify,
     };
   }
 }
