@@ -1,16 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ServicesService } from './services.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { Service } from 'db/entities';
+import { Roles } from 'src/common/decorators';
+import { RolesEnum } from 'src/common/enums';
+import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { ServicesService } from './services.service';
 
-@Controller('services')
+@Controller('service')
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
-  @Post()
-  create(@Body() createServiceDto: CreateServiceDto) {
-    return this.servicesService.create(createServiceDto);
+  // ============================================ Create new service
+
+  @Roles(RolesEnum.OWNER)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post('company/:companyId')
+  async create(
+    @Param('companyId') companyId: number,
+    @Body() createServiceDto: CreateServiceDto
+  ): Promise<Service> {
+    return await this.servicesService.create(createServiceDto, companyId);
   }
+
+  // ============================================
 
   @Get()
   findAll() {

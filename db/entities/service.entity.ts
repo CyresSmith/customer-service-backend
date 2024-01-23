@@ -56,10 +56,14 @@ export class Service {
   @Index()
   category: Category;
 
-  @ManyToMany(() => Employee, employee => employee.services)
+  @ManyToMany(() => Employee, employee => employee.services, {
+    onUpdate: 'CASCADE',
+  })
   employees: Employee[];
 
-  @ManyToMany(() => Resource, resource => resource.services)
+  @ManyToMany(() => Resource, resource => resource.services, {
+    onUpdate: 'CASCADE',
+  })
   resources: Resource[];
 
   @CreateDateColumn({ type: 'timestamp' })

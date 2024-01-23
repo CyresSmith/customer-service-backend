@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { Category } from 'db/entities';
+import { Service } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
-export class CategoriesRepository extends Repository<Category> {
+export class ServicesRepository extends Repository<Service> {
   constructor(private readonly ds: DataSource) {
-    super(Category, ds.createEntityManager());
+    super(Service, ds.createEntityManager());
   }
 
-  checkIsExist(name: string): Promise<Category> {
+  isExistCheck(name: string, companyId: number): Promise<Service> {
     return this.findOne({
       where: {
         name,
+        company: { id: companyId },
       },
     });
   }
 
-  getById(id: number): Promise<Category> {
+  getById(id: number): Promise<Service> {
     return this.findOne({
       where: {
         id,

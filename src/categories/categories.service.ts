@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CategoriesRepository,
   CompaniesRepository,
@@ -20,11 +20,19 @@ export class CategoriesService {
     createCategoryDto: CreateCategoryDto,
     companyId: number
   ): Promise<IBasicCategoryInfo> {
-    const company = await this.companyRepository.getById(companyId);
+    const { name } = createCategoryDto;
+
+    const isExist = await this.categoriesRepository.checkIsExist(name);
+
+    if (isExist) {
+      throw new BadRequestException(
+        `Category with name "${name}" is already exist`
+      );
+    }
 
     const newCategory = this.categoriesRepository.create({
       ...createCategoryDto,
-      companies: [company],
+      companies: [{ id: companyId }],
     });
 
     const category = await this.categoriesRepository.save(newCategory);
