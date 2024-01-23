@@ -25,6 +25,9 @@ export class EmailService {
         user: this.user,
         pass: this.pass,
       },
+      tls: {
+        rejectUnauthorized: false, // Тимчасово вимкнуто перевірку сертифіката, НЕ в продакшн
+      },
     });
   }
 
@@ -34,6 +37,7 @@ export class EmailService {
     try {
       return await this.transporter.sendMail({ ...data, from: this.user });
     } catch (error) {
+      console.log(error);
       throw new MethodNotAllowedException(error);
     }
   }
