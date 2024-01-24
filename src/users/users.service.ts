@@ -5,6 +5,7 @@ import { UsersRepository } from 'src/common/repositories';
 import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { EmailService } from 'src/email/email.service';
 import { ITokenPair } from 'src/token/token.types';
+import { v4 as uuid } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,7 +14,7 @@ import { IBasicUserInfo } from './users.types';
 const verificationEmail = (
   verificationCode: string
 ) => `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 30px;">
-                <table style="max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">        
+                <table style="max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
                   <tr>
                       <td style="text-align: center; padding: 20px 0;">
                           <h2>Email Verification</h2>
@@ -77,7 +78,7 @@ export class UsersService {
       throw new BadRequestException('User already exist');
     }
 
-    const verificationCode = this.generateRandomNumber(4);
+    const verificationCode = uuid();
 
     const newUser = this.usersRepository.create({
       ...createUserDto,
@@ -88,7 +89,7 @@ export class UsersService {
     await this.emailService.sendEmail({
       to: createUserDto.email,
       subject: 'Verify email',
-      html: verificationEmail(verificationCode),
+      html: `<a href=${this.configService.get<string>('FRONTEND_URL')}verify/${verificationCode}>Натисніть для підтвердження реєстрації</a>`,
     });
 
     const user = await this.usersRepository.save(newUser);
@@ -102,6 +103,7 @@ export class UsersService {
         phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName,
+        verify: user.verify,
       },
     };
   }

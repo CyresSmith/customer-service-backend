@@ -15,9 +15,8 @@ import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
-import { SendVerifyCodeDto } from './dto/send-veryfi-code.dto';
+import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { VerifyUserDto } from './dto/verify-user.dto';
 import { UsersService } from './users.service';
 import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
 
@@ -40,10 +39,12 @@ export class UsersController {
 
   // ============================================ Verify user
 
-  @Post('verify')
+  @Get('verify/:token')
   @HttpCode(200)
-  async verify(@Body() body: VerifyUserDto): Promise<IBasicUserInfoWithTokens> {
-    const user = await this.usersService.verify(body.code);
+  async verifyUser(
+    @Param('token') token: string
+  ): Promise<IBasicUserInfoWithTokens> {
+    const user = await this.usersService.verify(token);
     const tokenPair = await this.tokenService.generateNewTokenPair(user);
     await this.usersService.updateTokens(user.id, tokenPair);
     return { user, ...tokenPair };
