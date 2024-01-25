@@ -62,7 +62,7 @@ export class AuthController {
 
   // ============================================ Logout user
   @UseGuards(AccessTokenGuard)
-  @Get('logout')
+  @Post('logout')
   @HttpCode(200)
   async logout(
     @Request() { user }: { user: IBasicUserInfo }

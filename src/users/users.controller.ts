@@ -10,9 +10,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { Company } from 'db/entities';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
+import { CompaniesRepository } from 'src/common/repositories';
 import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
+import { DeepPartial } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
@@ -24,7 +27,8 @@ import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly companiesRepository: CompaniesRepository
   ) {}
 
   // ============================================ Register user
@@ -66,9 +70,17 @@ export class UsersController {
   @Get('current')
   @HttpCode(200)
   async getUserInfo(
-    @Request() req: { user: IBasicUserInfo }
-  ): Promise<IBasicUserInfo> {
-    return await this.usersService.getBaseInfo(req.user.id);
+    @Request() { user }: { user: IBasicUserInfo }
+  ): Promise<{ user: IBasicUserInfo; companies: DeepPartial<Company>[] }> {
+    const userData = await this.usersService.getBaseInfo(user.id);
+    const companies = await this.companiesRepository.find({
+      where: {
+        employees: { user: { id: user.id } },
+      },
+      select: ['name', 'id'],
+    });
+
+    return { user: userData, companies };
   }
 
   // ============================================ Password restore email
