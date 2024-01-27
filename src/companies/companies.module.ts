@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Company } from 'db/entities';
 import {
+  CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
   UsersRepository,
@@ -18,6 +19,7 @@ import { CompaniesService } from './companies.service';
     CompaniesService,
     EmployeesRepository,
     UsersRepository,
+    CategoriesRepository,
   ],
   exports: [CompaniesService],
 })

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActionsModule } from './actions/actions.module';
@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ClientsModule } from './clients/clients.module';
 import envConfig from './common/configs/env.config';
 import dbConfig from './common/configs/postgres.config';
+import { RequestLoggingMiddleware } from './common/middleware/logging.middleware';
 import { CompaniesModule } from './companies/companies.module';
 import { EmailModule } from './email/email.module';
 import { EmployeesModule } from './employees/employees.module';
@@ -38,4 +39,8 @@ import { UsersModule } from './users/users.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggingMiddleware).forRoutes('*');
+  }
+}

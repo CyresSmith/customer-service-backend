@@ -1,16 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { Activity } from 'db/entities';
+import { Roles } from 'src/common/decorators';
+import { RolesEnum } from 'src/common/enums';
+import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 
-@Controller('activities')
+@Controller('activity')
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
-  @Post()
-  create(@Body() createActivityDto: CreateActivityDto) {
+  // ============================================ Add activity
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post('company/:companyId')
+  create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
     return this.activitiesService.create(createActivityDto);
   }
+
+  // ============================================ Find all by category id
+
+  @UseGuards(AccessTokenGuard)
+  @Get('category/:categoryId')
+  findAllByCategoryId(
+    @Param('categoryId') categoryId: number
+  ): Promise<Activity[]> {
+    return this.activitiesService.findAllByCategoryId(categoryId);
+  }
+
+  // ============================================
 
   @Get()
   findAll() {
@@ -23,7 +52,10 @@ export class ActivitiesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateActivityDto: UpdateActivityDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateActivityDto: UpdateActivityDto
+  ) {
     return this.activitiesService.update(+id, updateActivityDto);
   }
 

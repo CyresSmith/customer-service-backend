@@ -11,16 +11,10 @@ export class UsersRepository extends Repository<User> {
 
   // ============================================ Is exist check
 
-  async isExistCheck(email: string, phone: string): Promise<number | null> {
-    const existUser = await this.findOne({
+  async checkIsExist(email: string, phone: string): Promise<User> {
+    return await this.findOne({
       where: [{ email }, { phone }],
     });
-
-    if (existUser && existUser.id) {
-      return existUser.id;
-    }
-
-    return null;
   }
 
   // ============================================ Get user by id

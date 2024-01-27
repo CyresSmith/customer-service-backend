@@ -10,10 +10,8 @@ export class CompaniesRepository extends Repository<Company> {
 
   // ============================================ Is exist check
 
-  async isExistCheck(name: string, phoneNumbers: string[]): Promise<boolean> {
-    const nameExist = await this.findOne({
-      where: { name },
-    });
+  async checkIsExist(name: string, phoneNumbers: string[]): Promise<boolean> {
+    const nameExist = await this.findOneBy({ name });
 
     if (nameExist && nameExist?.id) {
       throw new BadRequestException(

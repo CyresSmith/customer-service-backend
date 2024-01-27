@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Activity } from './activity.entity';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Product } from './product.entity';
@@ -20,6 +21,9 @@ export class Category {
 
   @ManyToMany(() => Company, company => company.categories)
   companies: Company[];
+
+  @OneToMany(() => Activity, activity => activity.category)
+  activities: Activity[];
 
   @Column({ nullable: false })
   name: string;

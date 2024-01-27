@@ -25,7 +25,7 @@ export interface IWorkingHours {
 
 export type JobTitle = 'admin' | 'master';
 
-export type CategoryType = 'employee' | 'service' | 'product';
+export type CategoryType = 'employee' | 'service' | 'product' | 'activity';
 
 export type ScheduleType = 'employee' | 'recourse';
 

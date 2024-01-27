@@ -31,7 +31,7 @@ export class Company {
   @Column({ nullable: false })
   address: string;
 
-  @Column({ type: 'jsonb', nullable: false })
+  @Column({ type: 'jsonb', nullable: true })
   workingHours: IWorkingHours;
 
   @ManyToMany(() => Activity, activity => activity.companies)
@@ -48,7 +48,7 @@ export class Company {
   })
   activities: Activity[];
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   desc: string;
 
   @Column({ nullable: true })

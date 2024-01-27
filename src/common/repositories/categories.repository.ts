@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Category } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
@@ -8,12 +8,16 @@ export class CategoriesRepository extends Repository<Category> {
     super(Category, ds.createEntityManager());
   }
 
-  checkIsExist(name: string): Promise<Category> {
-    return this.findOne({
-      where: {
-        name,
-      },
-    });
+  async checkIsExist(name: string): Promise<boolean> {
+    const isExist = await this.findOneBy({ name });
+
+    if (isExist) {
+      throw new BadRequestException(
+        `Category with name "${name}" is already exist`
+      );
+    }
+
+    return false;
   }
 
   getById(id: number): Promise<Category> {
