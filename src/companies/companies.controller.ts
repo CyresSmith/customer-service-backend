@@ -39,7 +39,7 @@ export class CompaniesController {
   async create(
     @Body() createCompanyDto: CreateCompanyDto,
     @Request() { user }: { user: IBasicUserInfo }
-  ): Promise<Company> {
+  ): Promise<Partial<Company>> {
     return await this.companiesService.create(createCompanyDto, user.id);
   }
 
@@ -55,14 +55,14 @@ export class CompaniesController {
   ): Promise<Employee> {
     const { userData, employeeData } = createEmployeeDto;
 
-    const existUserId = await this.userRepository.isExistCheck(
+    const existUser = await this.userRepository.checkIsExist(
       userData.email,
       userData.phone
     );
 
-    if (existUserId) {
+    if (existUser) {
       return await this.companiesService.addExistUserEmployee(
-        existUserId,
+        existUser.id,
         employeeData,
         companyId
       );

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Service } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
@@ -8,14 +8,24 @@ export class ServicesRepository extends Repository<Service> {
     super(Service, ds.createEntityManager());
   }
 
-  isExistCheck(name: string, companyId: number): Promise<Service> {
-    return this.findOne({
-      where: {
-        name,
-        company: { id: companyId },
-      },
+  // ============================================ Is exist check
+
+  async checkIsExist(name: string, companyId: number): Promise<boolean> {
+    const isExist = await this.findOneBy({
+      name,
+      company: { id: companyId },
     });
+
+    if (isExist) {
+      throw new BadRequestException(
+        `Service with name "${name}" for company ${companyId} is already exist`
+      );
+    }
+
+    return false;
   }
+
+  // ============================================ Get by id
 
   getById(id: number): Promise<Service> {
     return this.findOne({

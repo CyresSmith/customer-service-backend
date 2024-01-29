@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Category, Company, Employee, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
+  CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
 } from 'src/common/repositories';
@@ -15,7 +16,8 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 export class CompaniesService {
   constructor(
     private companyRepository: CompaniesRepository,
-    private employeesRepository: EmployeesRepository
+    private employeesRepository: EmployeesRepository,
+    private categoriesRepository: CategoriesRepository
   ) {}
 
   // ============================================ Create company
@@ -23,10 +25,15 @@ export class CompaniesService {
   async create(
     createCompanyDto: CreateCompanyDto,
     owner: number
-  ): Promise<Company> {
-    const { name, phones } = createCompanyDto;
+  ): Promise<Partial<Company>> {
+    const { name, phones, category } = createCompanyDto;
 
-    await this.companyRepository.isExistCheck(name, phones);
+    await this.companyRepository.checkIsExist(name, phones);
+    const isCategoryExist = await this.categoriesRepository.getById(category);
+
+    if (!isCategoryExist) {
+      throw new BadRequestException('Category not found');
+    }
 
     const newCompany = this.companyRepository.create({
       ...createCompanyDto,
@@ -42,7 +49,7 @@ export class CompaniesService {
 
     await this.employeesRepository.save(newEmployee);
 
-    return company;
+    return { id: company.id, name: company.name };
   }
 
   // ============================================ Add exist user employee
@@ -52,12 +59,7 @@ export class CompaniesService {
     employeeData: EmployeeDto,
     companyId: number
   ): Promise<Employee> {
-    const existEmployee =
-      await this.employeesRepository.isEmployeeUserExistCheck(userId);
-
-    if (existEmployee) {
-      throw new BadRequestException('Employee for this user is already exist');
-    }
+    await this.employeesRepository.checkIsExist(userId);
 
     const newEmployee = this.employeesRepository.create({
       ...employeeData,

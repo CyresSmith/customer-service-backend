@@ -1,23 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Employee } from 'db/entities';
+import { Activity } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
-export class EmployeesRepository extends Repository<Employee> {
+export class ActivityRepository extends Repository<Activity> {
   constructor(private readonly ds: DataSource) {
-    super(Employee, ds.createEntityManager());
+    super(Activity, ds.createEntityManager());
   }
 
   // ============================================ Is exist check
 
-  async checkIsExist(userId: number): Promise<boolean> {
-    const isExist = await this.findOneBy({
-      user: { id: userId },
-    });
+  async checkIsExist(name: string): Promise<boolean> {
+    const isExist = await this.findOneBy({ name });
 
     if (isExist) {
       throw new BadRequestException(
-        `Employee for user ${userId} is already exist`
+        `Activity with name "${name}" is already exist`
       );
     }
 
@@ -26,8 +24,8 @@ export class EmployeesRepository extends Repository<Employee> {
 
   // ============================================ Get by id
 
-  getById(id: number): Promise<Employee> {
-    return this.findOne({
+  async getById(id: number): Promise<Activity> {
+    return await this.findOne({
       where: {
         id,
       },

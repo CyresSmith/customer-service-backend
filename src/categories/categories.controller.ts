@@ -12,8 +12,9 @@ import {
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
+import { CategoryType } from 'src/common/types';
 import { CategoriesService } from './categories.service';
-import { IBasicCategoryInfo } from './categories.types';
+import { IBasicCategoryInfo, ICompanyCategoryInfo } from './categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -23,15 +24,28 @@ export class CategoriesController {
 
   // ============================================ Add category
 
+  @Post('')
+  @HttpCode(201)
+  create(
+    @Body() createCategoryDto: CreateCategoryDto
+  ): Promise<IBasicCategoryInfo> {
+    return this.categoriesService.create(createCategoryDto);
+  }
+
+  // ============================================ Add company category
+
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Post('company/:companyId')
   @HttpCode(201)
-  create(
+  createForCompany(
     @Body() createCategoryDto: CreateCategoryDto,
     @Param('companyId') companyId: number
   ): Promise<IBasicCategoryInfo> {
-    return this.categoriesService.create(createCategoryDto, companyId);
+    return this.categoriesService.createForCompany(
+      createCategoryDto,
+      companyId
+    );
   }
 
   // ============================================ Get all categories
@@ -43,7 +57,7 @@ export class CategoriesController {
     return await this.categoriesService.findAll();
   }
 
-  // ============================================ Get all categories
+  // ============================================ Get all categories by company id
 
   @UseGuards(AccessTokenGuard)
   @Get('company/:companyId')
@@ -52,6 +66,26 @@ export class CategoriesController {
     @Param('companyId') companyId: number
   ): Promise<IBasicCategoryInfo[]> {
     return await this.categoriesService.findAllByCompanyId(companyId);
+  }
+
+  // ============================================ Get categories by type
+
+  @UseGuards(AccessTokenGuard)
+  @Get('type/:type')
+  @HttpCode(200)
+  async findByType(
+    @Param('type') type: CategoryType
+  ): Promise<IBasicCategoryInfo[]> {
+    return await this.categoriesService.findByType(type);
+  }
+
+  // ============================================  Get Company Activity categories
+
+  @UseGuards(AccessTokenGuard)
+  @Get('company')
+  @HttpCode(200)
+  async findCompanyCategories(): Promise<ICompanyCategoryInfo[]> {
+    return await this.categoriesService.findCompanyCategories();
   }
 
   // ============================================

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Category, Company, Employee, Resource, Service } from 'db/entities';
 import { ServicesRepository } from 'src/common/repositories';
 import { DeepPartial } from 'typeorm';
@@ -17,13 +17,7 @@ export class ServicesService {
   ): Promise<Service> {
     const { name } = createServiceDto;
 
-    const isExist = await this.servicesRepository.isExistCheck(name, companyId);
-
-    if (isExist) {
-      throw new BadRequestException(
-        `Service with name "${name}" is already exist`
-      );
-    }
+    await this.servicesRepository.checkIsExist(name, companyId);
 
     const createServiceObj = (
       createServiceDto: CreateServiceDto
