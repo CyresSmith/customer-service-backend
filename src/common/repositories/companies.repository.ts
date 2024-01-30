@@ -39,11 +39,17 @@ export class CompaniesRepository extends Repository<Company> {
 
   getById(id: number): Promise<Company> {
     return this.findOne({
-      relations: ['employees', 'employees.user', 'employees.category'],
+      relations: [
+        'employees',
+        'employees.user',
+        'employees.category',
+        'activities',
+      ],
       where: {
         id,
       },
       select: {
+        activities: { id: true, name: true },
         employees: {
           id: true,
           jobTitle: true,
@@ -61,6 +67,56 @@ export class CompaniesRepository extends Repository<Company> {
             lastName: true,
           },
         },
+      },
+    });
+  }
+
+  // ============================================ Get Profile
+
+  async getProfile(id: number): Promise<Company> {
+    return await this.findOne({
+      relations: ['activities'],
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        avatar: true,
+        images: true,
+        phones: true,
+        workingHours: {
+          monday: {
+            from: true,
+            to: true,
+          },
+          tuesday: {
+            from: true,
+            to: true,
+          },
+          wednesday: {
+            from: true,
+            to: true,
+          },
+          thursday: {
+            from: true,
+            to: true,
+          },
+          friday: {
+            from: true,
+            to: true,
+          },
+          saturday: {
+            from: true,
+            to: true,
+          },
+          sunday: {
+            from: true,
+            to: true,
+          },
+        },
+        activities: { id: true, name: true },
       },
     });
   }

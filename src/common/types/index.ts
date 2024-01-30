@@ -36,3 +36,7 @@ export type EmployeeStatus = 'working' | 'fired';
 export type Gender = 'male' | 'female' | 'other';
 
 export type Role = 'user' | 'owner' | 'admin' | 'employee';
+
+export type Branches = 'one' | 'more';
+
+export type EmployeesCount = '2-5' | '6-9' | '10+';

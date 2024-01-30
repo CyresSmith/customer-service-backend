@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,7 +18,7 @@ export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => Company, company => company.categories)
+  @OneToMany(() => Company, company => company.category)
   companies: Company[];
 
   @OneToMany(() => Activity, activity => activity.category)

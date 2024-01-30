@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Branches, EmployeesCount } from 'src/common/types';
 import { IsArrayValidPhone } from 'src/common/validators/phone-array.validator';
 
 export class CreateCompanyDto {
@@ -27,4 +28,16 @@ export class CreateCompanyDto {
   @IsNumber()
   @IsNotEmpty({ message: 'Category is required' })
   category: number;
+
+  @IsArray()
+  @IsNotEmpty({ message: 'Activities is required' })
+  activities: number[];
+
+  @IsString()
+  @IsNotEmpty({ message: 'Employees count is required' })
+  employeesCount: EmployeesCount;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Branches is required' })
+  branches: Branches;
 }

@@ -37,6 +37,8 @@ export class CompaniesService {
 
     const newCompany = this.companyRepository.create({
       ...createCompanyDto,
+      category: { id: category },
+      activities: createCompanyDto.activities.map(id => ({ id })),
     });
 
     const company = await this.companyRepository.save(newCompany);
@@ -86,6 +88,18 @@ export class CompaniesService {
     });
 
     return await this.employeesRepository.save(newEmployee);
+  }
+
+  // ============================================ Get company profile
+
+  async getProfile(id: number): Promise<Company> {
+    const company = await this.companyRepository.getProfile(id);
+
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+
+    return company;
   }
 
   // ============================================

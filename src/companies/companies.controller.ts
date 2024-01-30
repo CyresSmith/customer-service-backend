@@ -79,10 +79,24 @@ export class CompaniesController {
 
   // ============================================ Get Company by id
 
-  @UseGuards(AccessTokenGuard)
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.companiesService.findOne(id);
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId')
+  findOne(@Param('companyId') companyId: number) {
+    return this.companiesService.findOne(companyId);
+  }
+
+  // ============================================ Get company profile
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('profile/:companyId')
+  async getProfile(@Param('companyId') companyId: number): Promise<Company> {
+    console.log(
+      '🚀 ~ CompaniesController ~ getProfile ~ companyId:',
+      companyId
+    );
+    return await this.companiesService.getProfile(companyId);
   }
 
   // ============================================

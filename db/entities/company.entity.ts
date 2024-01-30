@@ -3,8 +3,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -31,7 +33,18 @@ export class Company {
   @Column({ nullable: false })
   address: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({
+    type: 'jsonb',
+    default: {
+      monday: { from: 0, to: 0 },
+      tuesday: { from: 0, to: 0 },
+      wednesday: { from: 0, to: 0 },
+      thursday: { from: 0, to: 0 },
+      friday: { from: 0, to: 0 },
+      saturday: { from: 0, to: 0 },
+      sunday: { from: 0, to: 0 },
+    },
+  })
   workingHours: IWorkingHours;
 
   @ManyToMany(() => Activity, activity => activity.companies)
@@ -60,19 +73,9 @@ export class Company {
   })
   employees: Employee[];
 
-  @ManyToMany(() => Category, category => category.companies)
-  @JoinTable({
-    name: 'company_category_service',
-    joinColumn: {
-      name: 'companyId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'categoryId',
-      referencedColumnName: 'id',
-    },
-  })
-  categories: Category[];
+  @ManyToOne(() => Category, category => category.companies)
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 
   @OneToMany(() => Service, service => service.company)
   services: Service[];
@@ -88,6 +91,12 @@ export class Company {
 
   @Column({ type: 'jsonb', nullable: true, default: [] })
   images: string[];
+
+  @Column()
+  employeesCount: string;
+
+  @Column()
+  branches: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
