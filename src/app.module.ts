@@ -6,6 +6,8 @@ import { ActivitiesModule } from './activities/activities.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ClientsModule } from './clients/clients.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 import envConfig from './common/configs/env.config';
 import dbConfig from './common/configs/postgres.config';
 import { RequestLoggingMiddleware } from './common/middleware/logging.middleware';
@@ -35,9 +37,10 @@ import { UsersModule } from './users/users.module';
     ActivitiesModule,
     SchedulesModule,
     ActionsModule,
+    CloudinaryModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [CloudinaryService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

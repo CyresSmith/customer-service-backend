@@ -25,6 +25,9 @@ export class User {
   @Column({ nullable: true, default: '' })
   lastName: string;
 
+  @Column({ nullable: true, default: '' })
+  avatar: string;
+
   @OneToMany(() => Employee, employee => employee.user)
   employees: Employee[];
 

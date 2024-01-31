@@ -8,9 +8,13 @@ import {
   Patch,
   Post,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Company, Employee } from 'db/entities';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
@@ -28,7 +32,8 @@ export class CompaniesController {
   constructor(
     private readonly companiesService: CompaniesService,
     private readonly userService: UsersService,
-    private readonly userRepository: UsersRepository
+    private readonly userRepository: UsersRepository,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   // ============================================ Register company
@@ -90,13 +95,35 @@ export class CompaniesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get('profile/:companyId')
+  @Get(':companyId/profile')
   async getProfile(@Param('companyId') companyId: number): Promise<Company> {
-    console.log(
-      '🚀 ~ CompaniesController ~ getProfile ~ companyId:',
-      companyId
-    );
     return await this.companiesService.getProfile(companyId);
+  }
+
+  // ============================================ Update company avatar
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  @Post(':companyId/profile/avatar')
+  async updateAvatar(
+    @Param('companyId') companyId: number,
+    @UploadedFile() avatar: Express.Multer.File
+  ): Promise<{ url: string }> {
+    const { url } = await this.cloudinaryService.uploadFile(
+      {
+        folder: `company_${companyId}_avatars`,
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        max_bytes: 5 * 1024 * 1024,
+      },
+      avatar
+    );
+
+    await this.companiesService.updateAvatar(companyId, {
+      avatar: url,
+    });
+
+    return { url };
   }
 
   // ============================================

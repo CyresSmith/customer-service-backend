@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Company } from 'db/entities';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import {
   CategoriesRepository,
   CompaniesRepository,
@@ -12,7 +13,7 @@ import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company]), UsersModule],
+  imports: [TypeOrmModule.forFeature([Company]), UsersModule, CloudinaryModule],
   controllers: [CompaniesController],
   providers: [
     CompaniesRepository,

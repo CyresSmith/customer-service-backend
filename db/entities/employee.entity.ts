@@ -24,6 +24,9 @@ export class Employee {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true, default: '' })
+  avatar: string;
+
   @ManyToOne(() => User, user => user.employees)
   @JoinColumn({ name: 'userId' })
   @Index()

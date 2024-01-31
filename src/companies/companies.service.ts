@@ -102,6 +102,12 @@ export class CompaniesService {
     return company;
   }
 
+  // ============================================ Update company avatar
+
+  async updateAvatar(id: number, dto: { avatar: string }) {
+    return await this.companyRepository.update(id, dto);
+  }
+
   // ============================================
 
   findAll() {
@@ -112,8 +118,9 @@ export class CompaniesService {
     return this.companyRepository.getById(id);
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: number, updateCompanyDto: UpdateCompanyDto) {
+    return 'update';
+    // return await this.companyRepository.update(id, updateCompanyDto);
   }
 
   remove(id: number) {
