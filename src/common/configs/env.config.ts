@@ -26,6 +26,12 @@ const email = registerAs('email', () => ({
   pass: process.env.EMAIL_PASS,
 }));
 
+const cloudinary = registerAs('cloudinary', () => ({
+  cloud_name: process.env.CLOUD_NAME,
+  cloud_api_key: process.env.CLOUD_API_KEY,
+  cloud_api_secret: process.env.CLOUD_API_SECRET,
+}));
+
 export default {
   envFilePath: `.${process.env.NODE_ENV}.env`,
   validationSchema: Joi.object({
@@ -45,7 +51,10 @@ export default {
     EMAIL_PORT: Joi.string().required(),
     EMAIL_USER: Joi.string().required(),
     EMAIL_PASS: Joi.string().required(),
+    CLOUD_NAME: Joi.string().required(),
+    CLOUD_API_KEY: Joi.string().required(),
+    CLOUD_API_SECRET: Joi.string().required(),
   }),
-  load: [db, jwt, email],
+  load: [db, jwt, email, cloudinary],
   isGlobal: true,
 };
