@@ -86,36 +86,7 @@ export class CompaniesRepository extends Repository<Company> {
         avatar: true,
         images: true,
         phones: true,
-        workingHours: {
-          monday: {
-            from: true,
-            to: true,
-          },
-          tuesday: {
-            from: true,
-            to: true,
-          },
-          wednesday: {
-            from: true,
-            to: true,
-          },
-          thursday: {
-            from: true,
-            to: true,
-          },
-          friday: {
-            from: true,
-            to: true,
-          },
-          saturday: {
-            from: true,
-            to: true,
-          },
-          sunday: {
-            from: true,
-            to: true,
-          },
-        },
+        workingHours: true,
         activities: { id: true, name: true },
       },
     });

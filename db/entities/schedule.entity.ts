@@ -1,4 +1,4 @@
-import { IWorkTime, ScheduleType } from 'src/common/types';
+import { IDay, ScheduleType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -39,7 +39,7 @@ export class Schedule {
   month: number;
 
   @Column({ type: 'jsonb', nullable: false })
-  dates: Record<number, IWorkTime[]>;
+  dates: Record<number, IDay>;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

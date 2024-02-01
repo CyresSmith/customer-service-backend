@@ -69,10 +69,16 @@ export class UsersService {
   // ============================================ Create user
 
   async create(createUserDto: CreateUserDto): Promise<ICreateUserResponse> {
-    await this.usersRepository.checkIsExist(
+    const isExist = await this.usersRepository.checkIsExist(
       createUserDto.email,
       createUserDto.phone
     );
+
+    if (isExist) {
+      throw new BadRequestException(
+        'User with this email or phone already exist'
+      );
+    }
 
     const verificationCode = uuid();
 
