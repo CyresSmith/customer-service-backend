@@ -103,6 +103,15 @@ export class UsersController {
     return await this.usersService.restorePassword(body);
   }
 
+  // ============================================ Update user
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/update/:id')
+  @HttpCode(200)
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
   // ============================================
 
   @Get()
@@ -113,11 +122,6 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
