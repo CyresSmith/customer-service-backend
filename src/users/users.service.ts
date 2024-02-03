@@ -100,6 +100,7 @@ export class UsersService {
         firstName: user.firstName,
         lastName: user.lastName,
         verify: user.verify,
+        avatar: user.avatar,
       },
     };
   }
@@ -236,6 +237,22 @@ export class UsersService {
     return { message: 'Successfully logout' };
   }
 
+  // ============================================ Update user
+
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto
+  ): Promise<IBasicUserInfo> {
+    await this.usersRepository.update(id, updateUserDto);
+    return await this.usersRepository.getById(id);
+  }
+
+  // ============================================ Upload avatar
+
+  async uploadAvatar(id: number, data: { avatar: string }) {
+    return await this.usersRepository.update(id, data);
+  }
+
   // ============================================
 
   findAll() {
@@ -244,11 +261,6 @@ export class UsersService {
 
   findOne(id: number) {
     return this.usersRepository.getById(id);
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
   }
 
   remove(id: number) {

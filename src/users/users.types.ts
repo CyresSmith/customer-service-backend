@@ -4,7 +4,7 @@ import { ITokenPair } from 'src/token/token.types';
 export interface IBasicUserInfo
   extends Pick<
     User,
-    'id' | 'email' | 'phone' | 'firstName' | 'lastName' | 'verify'
+    'id' | 'email' | 'phone' | 'firstName' | 'lastName' | 'verify' | 'avatar'
   > {}
 
 export interface IBasicUserInfoWithTokens extends ITokenPair {
