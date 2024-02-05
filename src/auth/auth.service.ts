@@ -38,6 +38,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       verify: user.verify,
+      avatar: user.avatar,
     };
   }
 }

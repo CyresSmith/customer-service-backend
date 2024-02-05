@@ -8,7 +8,9 @@ import {
   Patch,
   Post,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Company } from 'db/entities';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
@@ -22,13 +24,16 @@ import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
-    private readonly companiesRepository: CompaniesRepository
+    private readonly companiesRepository: CompaniesRepository,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   // ============================================ Register user
@@ -103,6 +108,41 @@ export class UsersController {
     return await this.usersService.restorePassword(body);
   }
 
+  // ============================================ Update user
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/update/:id')
+  @HttpCode(200)
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  // ============================================ Upload avatar
+
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  @Post('/update/:id/avatar')
+  async updateAvatar(
+    @Param('id') id: number,
+    @UploadedFile() avatar: Express.Multer.File
+  ): Promise<{ url: string }> {
+
+    const { url } = await this.cloudinaryService.uploadFile(
+      {
+        folder: `user_${id}_avatars`,
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        max_bytes: 5 * 1024 * 1024,
+      },
+      avatar
+    );
+
+    await this.usersService.uploadAvatar(id, {
+      avatar: url,
+    });
+
+    return { url };
+  }
+
   // ============================================
 
   @Get()
@@ -113,11 +153,6 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
