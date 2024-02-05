@@ -26,6 +26,7 @@ import { UsersService } from './users.service';
 import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -126,7 +127,6 @@ export class UsersController {
     @Param('id') id: number,
     @UploadedFile() avatar: Express.Multer.File
   ): Promise<{ url: string }> {
-
     const { url } = await this.cloudinaryService.uploadFile(
       {
         folder: `user_${id}_avatars`,
@@ -141,6 +141,18 @@ export class UsersController {
     });
 
     return { url };
+  }
+
+  // ============================================ Update password
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/update-password/:id')
+  @HttpCode(200)
+  async updatePassword(
+    @Param('id') id: string,
+    @Body() updatePassDto: UpdatePasswordDto
+  ) {
+    return this.usersService.updatePassword(+id, updatePassDto);
   }
 
   // ============================================
