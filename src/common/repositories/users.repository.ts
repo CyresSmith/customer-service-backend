@@ -24,7 +24,7 @@ export class UsersRepository extends Repository<User> {
       where: {
         id,
       },
-      select: ['id', 'email', 'phone', 'firstName', 'lastName'],
+      select: ['id', 'email', 'phone', 'firstName', 'lastName', 'avatar'],
     });
 
     return { ...user };
