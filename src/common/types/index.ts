@@ -8,15 +8,16 @@ export interface ICreateUserResponse extends MessageResponse {
   user: IBasicUserInfo;
 }
 
-type DayId = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
-export interface IDay {
-  day: DayId;
-  from: number;
-  to: number;
+export interface ISchedule {
+  from: string;
+  to: string;
 }
 
-export type IWorkingHours = IDay[];
+export interface IWorkSchedule extends ISchedule {
+  days: number[];
+}
+
+export type IWorkingHours = IWorkSchedule[];
 
 export type JobTitle = 'admin' | 'master';
 
