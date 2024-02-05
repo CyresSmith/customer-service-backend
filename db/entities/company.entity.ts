@@ -35,17 +35,10 @@ export class Company {
 
   @Column({
     type: 'jsonb',
-    default: {
-      monday: { from: 0, to: 0 },
-      tuesday: { from: 0, to: 0 },
-      wednesday: { from: 0, to: 0 },
-      thursday: { from: 0, to: 0 },
-      friday: { from: 0, to: 0 },
-      saturday: { from: 0, to: 0 },
-      sunday: { from: 0, to: 0 },
-    },
+    nullable: true,
+    default: null,
   })
-  workingHours: IWorkingHours;
+  workingHours: IWorkingHours | null;
 
   @ManyToMany(() => Activity, activity => activity.companies)
   @JoinTable({

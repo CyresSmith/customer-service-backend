@@ -8,20 +8,16 @@ export interface ICreateUserResponse extends MessageResponse {
   user: IBasicUserInfo;
 }
 
-export interface IWorkTime {
-  from: number;
-  to: number;
+export interface ISchedule {
+  from: string;
+  to: string;
 }
 
-export interface IWorkingHours {
-  monday: IWorkTime;
-  tuesday: IWorkTime;
-  wednesday: IWorkTime;
-  thursday: IWorkTime;
-  friday: IWorkTime;
-  saturday: IWorkTime;
-  sunday: IWorkTime;
+export interface IWorkSchedule extends ISchedule {
+  days: number[];
 }
+
+export type IWorkingHours = IWorkSchedule[];
 
 export type JobTitle = 'admin' | 'master';
 

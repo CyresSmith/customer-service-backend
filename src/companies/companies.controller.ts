@@ -20,6 +20,7 @@ import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { UsersRepository } from 'src/common/repositories';
+import { IWorkingHours, MessageResponse } from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo } from 'src/users/users.types';
@@ -87,6 +88,7 @@ export class CompaniesController {
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Get(':companyId')
+  @HttpCode(200)
   findOne(@Param('companyId') companyId: number) {
     return this.companiesService.findOne(companyId);
   }
@@ -96,6 +98,7 @@ export class CompaniesController {
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Get(':companyId/profile')
+  @HttpCode(200)
   async getProfile(@Param('companyId') companyId: number): Promise<Company> {
     return await this.companiesService.getProfile(companyId);
   }
@@ -106,6 +109,7 @@ export class CompaniesController {
   @UseGuards(AccessTokenGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('avatar'))
   @Post(':companyId/profile/avatar')
+  @HttpCode(200)
   async updateAvatar(
     @Param('companyId') companyId: number,
     @UploadedFile() avatar: Express.Multer.File
@@ -124,6 +128,21 @@ export class CompaniesController {
     });
 
     return { url };
+  }
+
+  // ============================================ Update working hours
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post(':companyId/profile/working-hours')
+  @HttpCode(200)
+  async updateWorkingHours(
+    @Param('companyId') companyId: number,
+    @Body() workingHours: IWorkingHours
+  ): Promise<MessageResponse> {
+    await this.companiesService.updateWorkingHours(companyId, workingHours);
+
+    return { message: 'Working hours successfully updated' };
   }
 
   // ============================================

@@ -6,6 +6,7 @@ import {
   CompaniesRepository,
   EmployeesRepository,
 } from 'src/common/repositories';
+import { IWorkingHours } from 'src/common/types';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
@@ -106,6 +107,12 @@ export class CompaniesService {
 
   async updateAvatar(id: number, dto: { avatar: string }) {
     return await this.companyRepository.update(id, dto);
+  }
+
+  // ============================================ Update working hours
+
+  async updateWorkingHours(id: number, workingHours: IWorkingHours) {
+    return await this.companyRepository.update(id, { workingHours });
   }
 
   // ============================================
