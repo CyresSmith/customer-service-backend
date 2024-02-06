@@ -4,6 +4,10 @@ export type MessageResponse = {
   message: string;
 };
 
+export interface IMessageResponseWithData<T> extends MessageResponse {
+  data: T;
+}
+
 export interface ICreateUserResponse extends MessageResponse {
   user: IBasicUserInfo;
 }
@@ -13,7 +17,8 @@ export interface ISchedule {
   to: string;
 }
 
-export interface IWorkSchedule extends ISchedule {
+export interface IWorkSchedule {
+  schedule: ISchedule;
   days: number[];
 }
 

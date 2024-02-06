@@ -6,10 +6,10 @@ import {
   CompaniesRepository,
   EmployeesRepository,
 } from 'src/common/repositories';
-import { IWorkingHours } from 'src/common/types';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
@@ -109,10 +109,26 @@ export class CompaniesService {
     return await this.companyRepository.update(id, dto);
   }
 
-  // ============================================ Update working hours
+  // ============================================ Update company profile
 
-  async updateWorkingHours(id: number, workingHours: IWorkingHours) {
-    return await this.companyRepository.update(id, { workingHours });
+  async updateProfile(id: number, data: UpdateCompanyDto) {
+    const isExist = await this.companyRepository.findOneBy({ id });
+
+    if (!isExist) {
+      throw new BadRequestException(`Company with id "${id}" not found`);
+    }
+
+    const updateObj = (): QueryDeepPartialEntity<Company> => {
+      let dataObj: QueryDeepPartialEntity<Company>;
+
+      if (data.activities && data.activities.length > 0) {
+        dataObj.activities = data.activities.map(id => ({ id }));
+      }
+
+      return { ...data, ...dataObj } as QueryDeepPartialEntity<Company>;
+    };
+
+    return await this.companyRepository.update(id, updateObj());
   }
 
   // ============================================
