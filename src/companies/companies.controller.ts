@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Company, Employee } from 'db/entities';
+import { Activity, Company, Employee } from 'db/entities';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -104,6 +104,18 @@ export class CompaniesController {
     return await this.companiesService.getProfile(companyId);
   }
 
+  // ============================================ Get company Activities
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/activities')
+  @HttpCode(200)
+  async getActivities(
+    @Param('companyId') companyId: number
+  ): Promise<Activity[]> {
+    return await this.companiesService.getActivities(companyId);
+  }
+
   // ============================================ Update company avatar
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
@@ -141,7 +153,6 @@ export class CompaniesController {
     @Param('companyId') companyId: number,
     @Body() data: UpdateCompanyProfileDto
   ): Promise<MessageResponse> {
-    console.log('🚀 ~ CompaniesController ~ data:', data);
     await this.companiesService.updateProfile(companyId, data);
 
     return { message: 'Successfully updated' };

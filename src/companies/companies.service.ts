@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Category, Company, Employee, User } from 'db/entities';
+import { Activity, Category, Company, Employee, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
   CategoriesRepository,
@@ -9,7 +9,6 @@ import {
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
@@ -103,6 +102,32 @@ export class CompaniesService {
     return company;
   }
 
+  // ============================================ Get company Activities
+
+  async getActivities(id: number): Promise<Activity[]> {
+    const company = await this.companyRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['category', 'category.activities'],
+      select: {
+        category: {
+          id: true,
+          activities: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+
+    return company.category.activities;
+  }
+
   // ============================================ Update company avatar
 
   async updateAvatar(id: number, dto: { avatar: string }) {
@@ -117,18 +142,21 @@ export class CompaniesService {
     if (!isExist) {
       throw new BadRequestException(`Company with id "${id}" not found`);
     }
+    const { activities, category, ...filteredData } = data;
 
-    const updateObj = (): QueryDeepPartialEntity<Company> => {
-      let dataObj: QueryDeepPartialEntity<Company>;
+    if (activities) {
+      isExist.activities = activities.map(id => ({ id })) as Activity[];
 
-      if (data.activities && data.activities.length > 0) {
-        dataObj.activities = data.activities.map(id => ({ id }));
-      }
+      await this.companyRepository.save(isExist);
+    }
 
-      return { ...data, ...dataObj } as QueryDeepPartialEntity<Company>;
-    };
+    if (category) {
+      isExist.category = { id: category } as Category;
 
-    return await this.companyRepository.update(id, updateObj());
+      await this.companyRepository.save(isExist);
+    }
+
+    return await this.companyRepository.update(id, filteredData);
   }
 
   // ============================================
