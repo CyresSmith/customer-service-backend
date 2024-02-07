@@ -13,19 +13,20 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Company, Employee } from 'db/entities';
+import { Activity, Company, Employee } from 'db/entities';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { UsersRepository } from 'src/common/repositories';
-import { IWorkingHours, MessageResponse } from 'src/common/types';
+import { MessageResponse } from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Controller('company')
@@ -103,6 +104,18 @@ export class CompaniesController {
     return await this.companiesService.getProfile(companyId);
   }
 
+  // ============================================ Get company Activities
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/activities')
+  @HttpCode(200)
+  async getActivities(
+    @Param('companyId') companyId: number
+  ): Promise<Activity[]> {
+    return await this.companiesService.getActivities(companyId);
+  }
+
   // ============================================ Update company avatar
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
@@ -130,19 +143,19 @@ export class CompaniesController {
     return { url };
   }
 
-  // ============================================ Update working hours
+  // ============================================ Update company profile
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/profile/working-hours')
+  @Patch(':companyId/profile')
   @HttpCode(200)
-  async updateWorkingHours(
+  async updateProfile(
     @Param('companyId') companyId: number,
-    @Body() workingHours: IWorkingHours
+    @Body() data: UpdateCompanyProfileDto
   ): Promise<MessageResponse> {
-    await this.companiesService.updateWorkingHours(companyId, workingHours);
+    await this.companiesService.updateProfile(companyId, data);
 
-    return { message: 'Working hours successfully updated' };
+    return { message: 'Successfully updated' };
   }
 
   // ============================================

@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Category, Company, Employee, User } from 'db/entities';
+import { Activity, Category, Company, Employee, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
   CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
 } from 'src/common/repositories';
-import { IWorkingHours } from 'src/common/types';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
@@ -103,16 +102,61 @@ export class CompaniesService {
     return company;
   }
 
+  // ============================================ Get company Activities
+
+  async getActivities(id: number): Promise<Activity[]> {
+    const company = await this.companyRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['category', 'category.activities'],
+      select: {
+        category: {
+          id: true,
+          activities: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!company) {
+      throw new BadRequestException('Company not found');
+    }
+
+    return company.category.activities;
+  }
+
   // ============================================ Update company avatar
 
   async updateAvatar(id: number, dto: { avatar: string }) {
     return await this.companyRepository.update(id, dto);
   }
 
-  // ============================================ Update working hours
+  // ============================================ Update company profile
 
-  async updateWorkingHours(id: number, workingHours: IWorkingHours) {
-    return await this.companyRepository.update(id, { workingHours });
+  async updateProfile(id: number, data: UpdateCompanyDto) {
+    const isExist = await this.companyRepository.findOneBy({ id });
+
+    if (!isExist) {
+      throw new BadRequestException(`Company with id "${id}" not found`);
+    }
+    const { activities, category, ...filteredData } = data;
+
+    if (activities) {
+      isExist.activities = activities.map(id => ({ id })) as Activity[];
+
+      await this.companyRepository.save(isExist);
+    }
+
+    if (category) {
+      isExist.category = { id: category } as Category;
+
+      await this.companyRepository.save(isExist);
+    }
+
+    return await this.companyRepository.update(id, filteredData);
   }
 
   // ============================================
