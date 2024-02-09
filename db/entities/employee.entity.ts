@@ -13,7 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Action } from './action.entity';
-import { Category } from './category.entity';
 import { Company } from './company.entity';
 import { Schedule } from './schedule.entity';
 import { Service } from './service.entity';
@@ -35,10 +34,10 @@ export class Employee {
   @Column({ nullable: true })
   jobTitle: JobTitle;
 
-  @ManyToOne(() => Category, category => category.employees)
-  @JoinColumn({ name: 'categoryId' })
-  @Index()
-  category: Category;
+  // @ManyToOne(() => Category, category => category.employees)
+  // @JoinColumn({ name: 'categoryId' })
+  // @Index()
+  // category: Category;
 
   @Column({ nullable: true })
   info: string;

@@ -22,8 +22,10 @@ import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { UsersRepository } from 'src/common/repositories';
 import { MessageResponse } from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
+import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-employee.dto';
+import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { UsersService } from 'src/users/users.service';
-import { IBasicUserInfo } from 'src/users/users.types';
+import { IBasicUserInfo, IUserData } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
@@ -50,16 +52,35 @@ export class CompaniesController {
     return await this.companiesService.create(createCompanyDto, user.id);
   }
 
-  // ============================================ Add employee
+  // ============================================ Add exist user employee
 
   @Roles(RolesEnum.OWNER)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/add-employee')
+  @Post(':companyId/add-exist-user-employee')
+  @HttpCode(200)
+  async addExistUserEmployee(
+    @Param('companyId') companyId: number,
+    @Body() createEmployeeDto: CreateExistUserEmployeeDto
+  ): Promise<Employee> {
+    const { userId, employeeData } = createEmployeeDto;
+
+    return await this.companiesService.addExistUserEmployee(
+      userId,
+      employeeData,
+      companyId
+    );
+  }
+
+  // ============================================ Add new user employee
+
+  @Roles(RolesEnum.OWNER)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post(':companyId/add-new-user-employee')
   @HttpCode(200)
   async addEmployee(
     @Param('companyId') companyId: number,
     @Body() createEmployeeDto: CreateEmployeeDto
-  ): Promise<Employee> {
+  ): Promise<IBasicEmployeeInfo> {
     const { userData, employeeData } = createEmployeeDto;
 
     const existUser = await this.userRepository.checkIsExist(
@@ -156,6 +177,20 @@ export class CompaniesController {
     await this.companiesService.updateProfile(companyId, data);
 
     return { message: 'Successfully updated' };
+  }
+
+  // ============================================ Find employee data
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post(':companyId/find-employee-data')
+  @HttpCode(200)
+  async findEmployeeData(
+    @Param('companyId') companyId: number,
+    @Body() { email }: { email: string }
+  ): Promise<IUserData> {
+    await this.companiesService.checkIsEmployeeExist(email, companyId);
+    return await this.userService.getUserDataByEmail(email);
   }
 
   // ============================================
