@@ -8,7 +8,7 @@ export class ClientsService {
   constructor(private clientsRepository: ClientsRepository) {}
 
   create(createClientDto: CreateClientDto) {
-    return 'This action adds a new client';
+    return this.clientsRepository.save(createClientDto);
   }
 
   findAll() {

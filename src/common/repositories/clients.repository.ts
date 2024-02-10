@@ -8,6 +8,15 @@ export class ClientsRepository extends Repository<Client> {
     super(Client, ds.createEntityManager());
   }
 
+  // findInCompany(id: number, companyId: number): Promise<Client> {
+  //   return this.findOne({
+  //     where: {
+  //       id,
+  //       company: companyId,
+  //     },
+  //   });
+  // }
+
   getById(id: number): Promise<Client> {
     return this.findOne({
       where: {
