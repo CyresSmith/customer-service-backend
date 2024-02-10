@@ -12,7 +12,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Company } from 'db/entities';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { CompaniesRepository } from 'src/common/repositories';
 import { ICreateUserResponse, MessageResponse } from 'src/common/types';
@@ -24,8 +26,6 @@ import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('users')

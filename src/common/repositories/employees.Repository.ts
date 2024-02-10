@@ -15,6 +15,8 @@ export class EmployeesRepository extends Repository<Employee> {
       user: { id: userId },
     });
 
+    console.log('🚀 ~ EmployeesRepository ~ checkIsExist ~ isExist:', isExist);
+
     if (isExist) {
       throw new BadRequestException(
         `Employee for user ${userId} is already exist`
@@ -28,8 +30,24 @@ export class EmployeesRepository extends Repository<Employee> {
 
   getById(id: number): Promise<Employee> {
     return this.findOne({
-      where: {
-        id,
+      where: { id },
+      relations: ['user'],
+      select: {
+        id: true,
+        jobTitle: true,
+        provider: true,
+        role: true,
+        status: true,
+        avatar: true,
+        info: true,
+        user: {
+          id: true,
+          email: true,
+          phone: true,
+          firstName: true,
+          lastName: true,
+          avatar: true,
+        },
       },
     });
   }

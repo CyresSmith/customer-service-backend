@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from 'db/entities';
-import { IBasicUserInfo } from 'src/users/users.types';
+import { IBasicUserInfo, IUserData } from 'src/users/users.types';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -55,5 +55,22 @@ export class UsersRepository extends Repository<User> {
     });
 
     return { ...user };
+  }
+
+  // ============================================ Get user data by email
+
+  async getUserDataByEmail(email: string): Promise<IUserData> {
+    const user = await this.findOne({
+      where: {
+        email,
+      },
+      select: ['id', 'email', 'phone', 'firstName', 'lastName', 'avatar'],
+    });
+
+    if (!user) {
+      throw new BadRequestException('Аккаунт не знайдено');
+    }
+
+    return user;
   }
 }

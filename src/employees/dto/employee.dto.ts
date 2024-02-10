@@ -1,12 +1,12 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { JobTitle, Role } from 'src/common/types';
 
 export class EmployeeDto {
   @IsString()
   jobTitle: JobTitle;
 
-  @IsNumber()
-  category: number;
+  // @IsNumber()
+  // category: number;
 
   @IsBoolean()
   provider: boolean;

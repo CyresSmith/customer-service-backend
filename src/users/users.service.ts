@@ -13,7 +13,7 @@ import { v4 as uuid } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { IBasicUserInfo } from './users.types';
+import { IBasicUserInfo, IUserData } from './users.types';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { promisify } from 'util';
 import { compare } from 'bcrypt';
@@ -237,6 +237,12 @@ export class UsersService {
 
   async getBaseInfo(userId: number): Promise<IBasicUserInfo> {
     return await this.usersRepository.getById(userId);
+  }
+
+  // ============================================ Get base user info
+
+  async getUserDataByEmail(email: string): Promise<IUserData> {
+    return await this.usersRepository.getUserDataByEmail(email);
   }
 
   // ============================================Logout user

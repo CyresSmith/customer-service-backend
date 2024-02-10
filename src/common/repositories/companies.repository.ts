@@ -42,7 +42,7 @@ export class CompaniesRepository extends Repository<Company> {
       relations: [
         'employees',
         'employees.user',
-        'employees.category',
+        // 'employees.category',
         'activities',
       ],
       where: {
@@ -53,18 +53,22 @@ export class CompaniesRepository extends Repository<Company> {
         employees: {
           id: true,
           jobTitle: true,
+          provider: true,
           role: true,
           status: true,
-          category: {
-            id: true,
-            name: true,
-          },
+          avatar: true,
+          info: true,
+          // category: {
+          //   id: true,
+          //   name: true,
+          // },
           user: {
             id: true,
             email: true,
             phone: true,
             firstName: true,
             lastName: true,
+            avatar: true,
           },
         },
       },

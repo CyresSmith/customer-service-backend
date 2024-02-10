@@ -7,10 +7,10 @@ import {
   EmployeesRepository,
 } from 'src/common/repositories';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
-import { IBasicUserInfo } from 'src/users/users.types';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { IBasicUserInfo } from 'src/users/users.types';
 
 @Injectable()
 export class CompaniesService {
@@ -61,16 +61,38 @@ export class CompaniesService {
     employeeData: EmployeeDto,
     companyId: number
   ): Promise<Employee> {
-    await this.employeesRepository.checkIsExist(userId);
+    const existEmployee = await this.employeesRepository.findOne({
+      where: { user: { id: userId }, company: { id: companyId } },
+    });
+
+    if (existEmployee) {
+      throw new BadRequestException('Співробітник вже зареєстровано!');
+    }
 
     const newEmployee = this.employeesRepository.create({
       ...employeeData,
-      category: employeeData.category as DeepPartial<Category>,
+      // category: employeeData.category as DeepPartial<Category>,
       user: userId as DeepPartial<User>,
       company: companyId as DeepPartial<Company>,
     });
 
-    return await this.employeesRepository.save(newEmployee);
+    const employee = await this.employeesRepository.save(newEmployee);
+
+    return await this.employeesRepository.getById(employee.id);
+  }
+
+  // ============================================ Check is user employee exist
+
+  async checkIsEmployeeExist(email: string, companyId: number) {
+    const employee = await this.employeesRepository.findOne({
+      where: { user: { email }, company: { id: companyId } },
+    });
+
+    if (employee) {
+      throw new BadRequestException(
+        'Співробітник з цією поштою вже зареєстровано!'
+      );
+    }
   }
 
   // ============================================ Add new user employee
@@ -82,7 +104,7 @@ export class CompaniesService {
   ): Promise<Employee> {
     const newEmployee = this.employeesRepository.create({
       ...employeeData,
-      category: employeeData.category as DeepPartial<Category>,
+      // category: employeeData.category as DeepPartial<Category>,
       user,
       company: companyId as DeepPartial<Company>,
     });

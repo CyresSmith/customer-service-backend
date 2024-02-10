@@ -7,6 +7,8 @@ export interface IBasicUserInfo
     'id' | 'email' | 'phone' | 'firstName' | 'lastName' | 'verify' | 'avatar'
   > {}
 
+export interface IUserData extends Omit<IBasicUserInfo, 'verify'> {}
+
 export interface IBasicUserInfoWithTokens extends ITokenPair {
   user: IBasicUserInfo;
 }

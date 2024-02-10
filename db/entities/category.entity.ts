@@ -30,8 +30,8 @@ export class Category {
   @Column({ nullable: false })
   type: CategoryType;
 
-  @OneToMany(() => Employee, employee => employee.category)
-  employees: Employee[];
+  // @OneToMany(() => Employee, employee => employee.category)
+  // employees: Employee[];
 
   @OneToMany(() => Service, service => service.category)
   services: Service[];
