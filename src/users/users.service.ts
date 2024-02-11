@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
@@ -10,6 +14,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IBasicUserInfo, IUserData } from './users.types';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { promisify } from 'util';
+import { compare } from 'bcrypt';
 
 const verificationEmail = (
   verificationCode: string
@@ -263,6 +270,39 @@ export class UsersService {
 
   async uploadAvatar(id: number, data: { avatar: string }) {
     return await this.usersRepository.update(id, data);
+  }
+
+  // ============================================ Update password
+
+  async updatePassword(
+    id: number,
+    updatePassDto: UpdatePasswordDto
+  ): Promise<MessageResponse> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    const { password, newPassword } = updatePassDto;
+
+    if (!user || !user.password) {
+      throw new ForbiddenException('User not found');
+    }
+
+    if (!user.verify) {
+      throw new ForbiddenException('Please confirm Your registration');
+    }
+
+    if (!(await promisify(compare)(password, user.password))) {
+      throw new ForbiddenException('Email or password is wrong');
+    }
+
+    const hashedPass = await hash(newPassword, 10);
+
+    await this.usersRepository.update(id, { password: hashedPass });
+
+    return { message: 'Password successfully updated' };
   }
 
   // ============================================

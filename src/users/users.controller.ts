@@ -26,6 +26,7 @@ import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -140,6 +141,18 @@ export class UsersController {
     });
 
     return { url };
+  }
+
+  // ============================================ Update password
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('/update-password/:id')
+  @HttpCode(200)
+  async updatePassword(
+    @Param('id') id: string,
+    @Body() updatePassDto: UpdatePasswordDto
+  ) {
+    return this.usersService.updatePassword(+id, updatePassDto);
   }
 
   // ============================================

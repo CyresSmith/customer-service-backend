@@ -3,19 +3,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Company } from './company.entity';
 
 @Entity({ name: 'Client' })
 export class Client {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true })
   email: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: false })
   phone: string;
 
   @Column({ nullable: false })
@@ -44,4 +47,8 @@ export class Client {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @ManyToOne(() => Company, company => company.clients)
+  @Index()
+  company: Company;
 }

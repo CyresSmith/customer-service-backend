@@ -18,6 +18,7 @@ import { Employee } from './employee.entity';
 import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
+import { Client } from './client.entity';
 
 @Entity({ name: 'Company' })
 export class Company {
@@ -81,6 +82,9 @@ export class Company {
 
   @OneToMany(() => Action, action => action.company)
   actions: Action[];
+
+  @OneToMany(() => Client, client => client.company)
+  clients: Client[];
 
   @Column({ type: 'jsonb', nullable: true, default: [] })
   images: string[];
