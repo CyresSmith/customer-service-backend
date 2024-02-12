@@ -95,11 +95,11 @@ export class CompaniesController {
         companyId
       );
     } else {
-      const { user: newUser } = await this.userService.create(userData);
+      const { user } = await this.userService.create(userData);
 
       return await this.companiesService.addNewUserEmployee(
-        newUser,
-        employeeData,
+        user.id,
+        createEmployeeDto,
         companyId
       );
     }

@@ -5,18 +5,20 @@ import {
   CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
+  UsersRepository,
 } from 'src/common/repositories';
+import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { IBasicUserInfo } from 'src/users/users.types';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     private companyRepository: CompaniesRepository,
     private employeesRepository: EmployeesRepository,
+    private usersRepository: UsersRepository,
     private categoriesRepository: CategoriesRepository
   ) {}
 
@@ -42,9 +44,14 @@ export class CompaniesService {
     });
 
     const company = await this.companyRepository.save(newCompany);
+    const user = await this.usersRepository.findOneBy({ id: owner });
 
     const newEmployee = this.employeesRepository.create({
       user: owner as DeepPartial<User>,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      email: user.email,
       role: RolesEnum.OWNER,
       company: company.id as DeepPartial<Company>,
     });
@@ -69,9 +76,19 @@ export class CompaniesService {
       throw new BadRequestException('Співробітник вже зареєстровано!');
     }
 
+    const user = await this.usersRepository.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new BadRequestException('Користувач не знайдено');
+    }
+
     const newEmployee = this.employeesRepository.create({
       ...employeeData,
       // category: employeeData.category as DeepPartial<Category>,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
       user: userId as DeepPartial<User>,
       company: companyId as DeepPartial<Company>,
     });
@@ -98,18 +115,23 @@ export class CompaniesService {
   // ============================================ Add new user employee
 
   async addNewUserEmployee(
-    user: IBasicUserInfo,
-    employeeData: EmployeeDto,
+    userId: number,
+    createEmployeeDto: CreateEmployeeDto,
     companyId: number
   ): Promise<Employee> {
+    const { userData, employeeData } = createEmployeeDto;
+
     const newEmployee = this.employeesRepository.create({
+      ...userData,
       ...employeeData,
       // category: employeeData.category as DeepPartial<Category>,
-      user,
+      user: userId as DeepPartial<User>,
       company: companyId as DeepPartial<Company>,
     });
 
-    return await this.employeesRepository.save(newEmployee);
+    const employee = await this.employeesRepository.save(newEmployee);
+
+    return await this.employeesRepository.getById(employee.id);
   }
 
   // ============================================ Get company profile
