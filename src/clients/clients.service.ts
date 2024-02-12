@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ClientsRepository } from 'src/common/repositories';
 import { CreateClientDto } from './dto/create-client.dto';
 import { Client } from 'db/entities';
-// import { UpdateClientDto } from './dto/update-client.dto';
+import { UpdateClientDto } from './dto/update-client.dto';
 
 @Injectable()
 export class ClientsService {
@@ -28,17 +28,26 @@ export class ClientsService {
     });
   }
 
-  async findById(id: number, companyId: number): Promise<Client> {
-    return this.clientsRepository.getById(companyId, id);
+  async findById(companyId: number, id: number): Promise<Client> {
+    return await this.clientsRepository.getById(companyId, id);
   }
 
   async findByPhone(companyId: number, phone: string): Promise<Client> {
-    return this.clientsRepository.getByPhone(companyId, phone);
+    return await this.clientsRepository.getByPhone(companyId, phone);
   }
 
-  // update(id: number, updateClientDto: UpdateClientDto) {
-  //   return `This action updates a #${id} client`;
-  // }
+  async uploadAvatar(id: number, data: { avatar: string }) {
+    return await this.clientsRepository.update(id, data);
+  }
+
+  async updateClient(
+    companyId: number,
+    id: number,
+    updateClientDto: UpdateClientDto
+  ): Promise<Client> {
+    await this.clientsRepository.update(id, updateClientDto);
+    return await this.findById(companyId, id);
+  }
 
   remove(id: number) {
     return `This action removes a #${id} client`;

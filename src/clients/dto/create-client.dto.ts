@@ -46,4 +46,8 @@ export class CreateClientDto {
   @IsString({ message: 'Last name must be a string' })
   @IsOptional()
   comment: string;
+
+  @IsString({ message: 'Last name must be a string' })
+  @IsOptional()
+  avatar: string;
 }
