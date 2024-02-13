@@ -203,6 +203,26 @@ export class CompaniesService {
     return await this.companyRepository.update(id, filteredData);
   }
 
+  // ============================================ Update company avatar
+
+  async checkCompanyEmployee(
+    companyId: number,
+    employeeId: number
+  ): Promise<Employee> {
+    const existEmployee = await this.employeesRepository.findOne({
+      where: {
+        id: employeeId,
+        company: { id: companyId },
+      },
+    });
+
+    if (!existEmployee) {
+      throw new BadRequestException('Користувача не існує!');
+    }
+
+    return existEmployee;
+  }
+
   // ============================================
 
   findAll() {
