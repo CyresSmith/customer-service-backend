@@ -1,4 +1,4 @@
-import { EmployeeStatus, JobTitle, Role } from 'src/common/types';
+import { EmployeeStatus, Gender, JobTitle, Role } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -22,6 +22,18 @@ import { User } from './user.entity';
 export class Employee {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ nullable: true, default: '' })
+  email: string;
+
+  @Column({ nullable: true, default: '' })
+  phone: string;
+
+  @Column({ nullable: true, default: '' })
+  firstName: string;
+
+  @Column({ nullable: true, default: '' })
+  lastName: string;
 
   @Column({ nullable: true, default: '' })
   avatar: string;
@@ -50,6 +62,12 @@ export class Employee {
 
   @Column({ nullable: false, default: 'user' })
   role: Role;
+
+  @Column({ nullable: true, default: '' })
+  birthday: string;
+
+  @Column({ nullable: true, default: '' })
+  gender: Gender;
 
   @ManyToOne(() => Company, company => company.id, {
     onDelete: 'CASCADE',

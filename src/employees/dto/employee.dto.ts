@@ -5,9 +5,6 @@ export class EmployeeDto {
   @IsString()
   jobTitle: JobTitle;
 
-  // @IsNumber()
-  // category: number;
-
   @IsBoolean()
   provider: boolean;
 

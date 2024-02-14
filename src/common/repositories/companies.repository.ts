@@ -58,6 +58,12 @@ export class CompaniesRepository extends Repository<Company> {
           status: true,
           avatar: true,
           info: true,
+          email: true,
+          phone: true,
+          firstName: true,
+          lastName: true,
+          birthday: true,
+          gender: true,
           // category: {
           //   id: true,
           //   name: true,

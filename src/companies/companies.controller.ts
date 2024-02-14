@@ -23,6 +23,8 @@ import { UsersRepository } from 'src/common/repositories';
 import { MessageResponse } from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-employee.dto';
+import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
+import { EmployeesService } from 'src/employees/employees.service';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo, IUserData } from 'src/users/users.types';
@@ -37,7 +39,8 @@ export class CompaniesController {
     private readonly companiesService: CompaniesService,
     private readonly userService: UsersService,
     private readonly userRepository: UsersRepository,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    private readonly employeesService: EmployeesService
   ) {}
 
   // ============================================ Register company
@@ -95,11 +98,11 @@ export class CompaniesController {
         companyId
       );
     } else {
-      const { user: newUser } = await this.userService.create(userData);
+      const { user } = await this.userService.create(userData);
 
       return await this.companiesService.addNewUserEmployee(
-        newUser,
-        employeeData,
+        user.id,
+        createEmployeeDto,
         companyId
       );
     }
@@ -191,6 +194,54 @@ export class CompaniesController {
   ): Promise<IUserData> {
     await this.companiesService.checkIsEmployeeExist(email, companyId);
     return await this.userService.getUserDataByEmail(email);
+  }
+
+  // ============================================ Update employee avatar
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  @Patch(':companyId/employee/:employeeId/avatar')
+  @HttpCode(200)
+  async updateEmployeeAvatar(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @UploadedFile() avatar: Express.Multer.File
+  ): Promise<{ url: string }> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    const { url } = await this.cloudinaryService.uploadFile(
+      {
+        folder: `company_${companyId}_avatars`,
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        max_bytes: 5 * 1024 * 1024,
+      },
+      avatar
+    );
+
+    await this.employeesService.updateProfile(employeeId, {
+      avatar: url as string,
+    });
+
+    return { url };
+  }
+
+  // ============================================ Update employee profile
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Patch(':companyId/employee/:employeeId/profile')
+  @HttpCode(200)
+  async updateEmployeeData(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: UpdateEmployeeProfileDto
+  ): Promise<MessageResponse> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    await this.employeesService.updateProfile(employeeId, data);
+
+    return { message: 'Профайл оновлено' };
   }
 
   // ============================================
