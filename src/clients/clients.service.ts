@@ -17,7 +17,7 @@ export class ClientsService {
       company: { id: companyId },
     });
 
-    return await this.findById(id, companyId);
+    return await this.findById(companyId, id);
   }
 
   async findAll(companyId: number): Promise<Client[]> {

@@ -15,7 +15,7 @@ export class Client {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: '' })
   email: string;
 
   @Column({ nullable: false })
@@ -41,6 +41,9 @@ export class Client {
 
   @Column({ nullable: true, default: '' })
   comment: string;
+
+  @Column({ nullable: true, default: '' })
+  source: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
