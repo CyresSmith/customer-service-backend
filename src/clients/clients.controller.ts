@@ -136,8 +136,23 @@ export class ClientsController {
     return { url };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientsService.remove(+id);
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(200)
+  @Delete(':companyId/:id/delete')
+  async remove(
+    @Param('id') id: number,
+    @Param('companyId') companyId: number
+  ): Promise<{ message: string }> {
+    const client = await this.clientsService.findById(companyId, id);
+
+    if (!client) {
+      throw new BadRequestException(
+        `Клієнта з id ${id} не знайдено в компанії з id ${companyId}`
+      );
+    }
+
+    await this.clientsService.remove(client);
+
+    return { message: 'Клієнта успішно видалено.' };
   }
 }

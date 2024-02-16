@@ -49,7 +49,7 @@ export class ClientsService {
     return await this.findById(companyId, id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} client`;
+  async remove(client: Client) {
+    return await this.clientsRepository.remove(client);
   }
 }
