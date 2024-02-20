@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { ISchedule } from 'src/common/types';
 
-class ScheduleDto {
+export class ScheduleDto {
   @IsString()
   @Length(5, 5)
   to: string;
@@ -22,7 +22,7 @@ class ScheduleDto {
 export class WorkingHoursDto {
   @ValidateNested()
   @Type(() => ScheduleDto)
-  schedule: ISchedule;
+  hours: ISchedule;
 
   @IsArray()
   @ArrayMinSize(1)

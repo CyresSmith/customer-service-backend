@@ -26,12 +26,14 @@ import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-
 import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
 import { EmployeesService } from 'src/employees/employees.service';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
+import { SchedulesService } from 'src/schedules/schedules.service';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo, IUserData } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { UpdateEmployeeScheduleDto } from './dto/update-employee-schedule.dto';
 
 @Controller('company')
 export class CompaniesController {
@@ -40,7 +42,8 @@ export class CompaniesController {
     private readonly userService: UsersService,
     private readonly userRepository: UsersRepository,
     private readonly cloudinaryService: CloudinaryService,
-    private readonly employeesService: EmployeesService
+    private readonly employeesService: EmployeesService,
+    private readonly schedulesService: SchedulesService
   ) {}
 
   // ============================================ Register company
@@ -242,6 +245,42 @@ export class CompaniesController {
     await this.employeesService.updateProfile(employeeId, data);
 
     return { message: 'Профайл оновлено' };
+  }
+
+  // ============================================ Update employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Patch(':companyId/employee/:employeeId/schedule')
+  @HttpCode(200)
+  async updateEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: UpdateEmployeeScheduleDto
+  ): Promise<MessageResponse> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    if (data?.scheduleId) {
+      const { scheduleId } = data;
+
+      await this.schedulesService.CheckIsExist(scheduleId);
+
+      return await this.schedulesService.updateEmployeeSchedule({
+        ...data,
+        companyId,
+        employeeId,
+      });
+    }
+
+    const newSchedule = await this.schedulesService.createEmployeeSchedule({
+      ...data,
+      companyId,
+      employeeId,
+    });
+
+    if (newSchedule) {
+      return { message: 'Графік оновлено' };
+    }
   }
 
   // ============================================

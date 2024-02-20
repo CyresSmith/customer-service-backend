@@ -80,7 +80,7 @@ export class Employee {
   @OneToMany(() => Action, action => action.employee)
   actions: Action[];
 
-  @OneToMany(() => Schedule, schedule => schedule.employees)
+  @OneToMany(() => Schedule, schedule => schedule.employee)
   schedules: Schedule[];
 
   @ManyToMany(() => Service, service => service.employees)

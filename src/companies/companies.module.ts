@@ -6,10 +6,13 @@ import {
   CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
+  SchedulesRepository,
   UsersRepository,
 } from 'src/common/repositories';
 import { EmployeesModule } from 'src/employees/employees.module';
 import { EmployeesService } from 'src/employees/employees.service';
+import { SchedulesModule } from 'src/schedules/schedules.module';
+import { SchedulesService } from 'src/schedules/schedules.service';
 import { UsersModule } from 'src/users/users.module';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
@@ -20,6 +23,7 @@ import { CompaniesService } from './companies.service';
     UsersModule,
     CloudinaryModule,
     EmployeesModule,
+    SchedulesModule,
   ],
   controllers: [CompaniesController],
   providers: [
@@ -29,6 +33,8 @@ import { CompaniesService } from './companies.service';
     UsersRepository,
     CategoriesRepository,
     EmployeesService,
+    SchedulesService,
+    SchedulesRepository,
   ],
   exports: [CompaniesService],
 })

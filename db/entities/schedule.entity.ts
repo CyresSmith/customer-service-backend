@@ -1,4 +1,4 @@
-import { ISchedule, ScheduleType } from 'src/common/types';
+import { IWorkSchedule, ScheduleType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -27,7 +27,7 @@ export class Schedule {
   type: ScheduleType;
 
   @ManyToOne(() => Employee, employee => employee.schedules)
-  employees: Employee;
+  employee: Employee;
 
   @ManyToOne(() => Resource, resource => resource.schedules)
   resource: Resource;
@@ -38,8 +38,12 @@ export class Schedule {
   @Column({ nullable: false })
   month: number;
 
-  @Column({ type: 'jsonb', nullable: false })
-  dates: Record<number, ISchedule>;
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+    default: null,
+  })
+  schedule: IWorkSchedule;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
