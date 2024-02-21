@@ -34,7 +34,7 @@ export type ActionType = 'sale' | 'service';
 
 export type EmployeeStatus = 'working' | 'fired';
 
-export type Gender = 'male' | 'female' | 'other';
+export type Gender = 'male' | 'female' | 'other' | '';
 
 export type Role = 'user' | 'owner' | 'admin' | 'employee';
 

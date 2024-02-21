@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -39,11 +40,19 @@ export class CreateClientDto {
   @IsOptional()
   gender: Gender;
 
-  @IsString({ message: 'Last name must be a string' })
+  @IsNumber()
   @IsOptional()
   discount: number;
 
   @IsString({ message: 'Last name must be a string' })
   @IsOptional()
   comment: string;
+
+  @IsString({ message: 'Last name must be a string' })
+  @IsOptional()
+  avatar: string;
+
+  @IsString({ message: 'Last name must be a string' })
+  @IsOptional()
+  source: string;
 }
