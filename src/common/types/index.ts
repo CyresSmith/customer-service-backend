@@ -18,8 +18,24 @@ export interface ISchedule {
 }
 
 export interface IWorkSchedule {
-  schedule: ISchedule;
+  hours: ISchedule;
   days: number[];
+  breakHours?: ISchedule;
+}
+
+export interface ICreateSchedule {
+  year: number;
+  month: number;
+  schedule: IWorkSchedule;
+}
+
+export interface ICreateEmployeeSchedule extends ICreateSchedule {
+  employeeId: number;
+  companyId: number;
+}
+
+export interface IUpdateEmployeeSchedule extends ICreateEmployeeSchedule {
+  id: number;
 }
 
 export type IWorkingHours = IWorkSchedule[];

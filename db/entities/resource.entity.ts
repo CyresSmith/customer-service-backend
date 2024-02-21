@@ -55,7 +55,7 @@ export class Resource {
   @ManyToMany(() => Action, action => action.resources)
   actions: Action[];
 
-  @OneToMany(() => Schedule, schedule => schedule.employees)
+  @OneToMany(() => Schedule, schedule => schedule.resource)
   schedules: Schedule[];
 
   @CreateDateColumn({ type: 'timestamp' })

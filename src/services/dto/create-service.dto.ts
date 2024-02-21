@@ -6,7 +6,6 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { Category, Resource } from 'db/entities';
 
 export class CreateServiceDto {
   @IsString()
@@ -23,7 +22,7 @@ export class CreateServiceDto {
 
   @IsNumber()
   @IsOptional()
-  break: number;
+  breakHours: number;
 
   @IsNumber()
   @IsDefined()

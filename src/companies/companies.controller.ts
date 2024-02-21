@@ -7,13 +7,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Activity, Company, Employee } from 'db/entities';
+import { Activity, Company, Employee, Schedule } from 'db/entities';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -26,12 +27,14 @@ import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-
 import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
 import { EmployeesService } from 'src/employees/employees.service';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
+import { SchedulesService } from 'src/schedules/schedules.service';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo, IUserData } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { UpdateEmployeeScheduleDto } from './dto/update-employee-schedule.dto';
 
 @Controller('company')
 export class CompaniesController {
@@ -40,7 +43,8 @@ export class CompaniesController {
     private readonly userService: UsersService,
     private readonly userRepository: UsersRepository,
     private readonly cloudinaryService: CloudinaryService,
-    private readonly employeesService: EmployeesService
+    private readonly employeesService: EmployeesService,
+    private readonly schedulesService: SchedulesService
   ) {}
 
   // ============================================ Register company
@@ -242,6 +246,86 @@ export class CompaniesController {
     await this.employeesService.updateProfile(employeeId, data);
 
     return { message: 'Профайл оновлено' };
+  }
+
+  // ============================================ Update employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Patch(':companyId/employee/:employeeId/schedule')
+  @HttpCode(200)
+  async updateEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: UpdateEmployeeScheduleDto
+  ): Promise<MessageResponse> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    const existSchedule = await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      data?.year,
+      data?.month
+    );
+
+    if (existSchedule) {
+      await this.schedulesService.updateScheduleById(
+        existSchedule.id,
+        data.schedule
+      );
+    } else {
+      await this.schedulesService.createEmployeeSchedule({
+        ...data,
+        companyId,
+        employeeId,
+      });
+    }
+
+    return { message: 'Графік оновлено' };
+  }
+
+  // ============================================ Get employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/employee/:employeeId/schedule')
+  @HttpCode(200)
+  async getEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Query('year') year: number,
+    @Query('month') month: number
+  ): Promise<Schedule> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    return await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      year,
+      month
+    );
+  }
+
+  // ============================================ Delete employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Delete(':companyId/employee/:employeeId/schedule/:scheduleId')
+  @HttpCode(200)
+  async deleteEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Param('scheduleId') scheduleId: number
+  ): Promise<MessageResponse> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    await this.schedulesService.deleteScheduleById(
+      scheduleId,
+      companyId,
+      employeeId
+    );
+
+    return { message: 'Графік оновлено' };
   }
 
   // ============================================
