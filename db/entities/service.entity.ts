@@ -37,7 +37,7 @@ export class Service {
   duration: number;
 
   @Column({ nullable: true })
-  break: number;
+  breakHours: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;

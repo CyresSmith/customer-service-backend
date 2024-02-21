@@ -24,7 +24,7 @@ export class ScheduleHoursAndDatesDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => ScheduleDto)
-  break: ISchedule;
+  breakHours: ISchedule;
 }
 
 const date = new Date(Date.now());
@@ -35,7 +35,7 @@ export class UpdateEmployeeScheduleDto {
   @IsOptional()
   @IsNumber()
   @IsDefined()
-  scheduleId: number;
+  id: number;
 
   @IsNumber()
   @IsDefined()

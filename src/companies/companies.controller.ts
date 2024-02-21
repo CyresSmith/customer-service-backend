@@ -7,13 +7,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Activity, Company, Employee } from 'db/entities';
+import { Activity, Company, Employee, Schedule } from 'db/entities';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -260,27 +261,71 @@ export class CompaniesController {
   ): Promise<MessageResponse> {
     await this.companiesService.checkCompanyEmployee(companyId, employeeId);
 
-    if (data?.scheduleId) {
-      const { scheduleId } = data;
+    const existSchedule = await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      data?.year,
+      data?.month
+    );
 
-      await this.schedulesService.CheckIsExist(scheduleId);
-
-      return await this.schedulesService.updateEmployeeSchedule({
+    if (existSchedule) {
+      await this.schedulesService.updateScheduleById(
+        existSchedule.id,
+        data.schedule
+      );
+    } else {
+      await this.schedulesService.createEmployeeSchedule({
         ...data,
         companyId,
         employeeId,
       });
     }
 
-    const newSchedule = await this.schedulesService.createEmployeeSchedule({
-      ...data,
+    return { message: 'Графік оновлено' };
+  }
+
+  // ============================================ Get employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/employee/:employeeId/schedule')
+  @HttpCode(200)
+  async getEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Query('year') year: number,
+    @Query('month') month: number
+  ): Promise<Schedule> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    return await this.schedulesService.getEmployeeSchedule(
       companyId,
       employeeId,
-    });
+      year,
+      month
+    );
+  }
 
-    if (newSchedule) {
-      return { message: 'Графік оновлено' };
-    }
+  // ============================================ Delete employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Delete(':companyId/employee/:employeeId/schedule/:scheduleId')
+  @HttpCode(200)
+  async deleteEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Param('scheduleId') scheduleId: number
+  ): Promise<MessageResponse> {
+    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+
+    await this.schedulesService.deleteScheduleById(
+      scheduleId,
+      companyId,
+      employeeId
+    );
+
+    return { message: 'Графік оновлено' };
   }
 
   // ============================================

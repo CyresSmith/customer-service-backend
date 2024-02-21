@@ -20,14 +20,13 @@ export interface ISchedule {
 export interface IWorkSchedule {
   hours: ISchedule;
   days: number[];
-  break?: ISchedule;
+  breakHours?: ISchedule;
 }
 
-interface ICreateSchedule {
+export interface ICreateSchedule {
   year: number;
   month: number;
   schedule: IWorkSchedule;
-  companyId: number;
 }
 
 export interface ICreateEmployeeSchedule extends ICreateSchedule {
@@ -36,7 +35,7 @@ export interface ICreateEmployeeSchedule extends ICreateSchedule {
 }
 
 export interface IUpdateEmployeeSchedule extends ICreateEmployeeSchedule {
-  scheduleId: number;
+  id: number;
 }
 
 export type IWorkingHours = IWorkSchedule[];
