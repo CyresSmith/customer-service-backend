@@ -1,4 +1,4 @@
-import { IWorkSchedule, ScheduleType } from 'src/common/types';
+import { MonthSchedule, ScheduleType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -43,7 +43,7 @@ export class Schedule {
     nullable: true,
     default: null,
   })
-  schedule: IWorkSchedule;
+  schedule: MonthSchedule;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
