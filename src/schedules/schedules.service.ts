@@ -3,8 +3,8 @@ import { Schedule } from 'db/entities';
 import { SchedulesRepository } from 'src/common/repositories';
 import {
   ICreateEmployeeSchedule,
-  IWorkSchedule,
   MessageResponse,
+  MonthSchedule,
 } from 'src/common/types';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
@@ -36,11 +36,11 @@ export class SchedulesService {
     return await this.schedulesRepository.save(newSchedule);
   }
 
-  // ============================================ Update Employee Schedule
+  // ============================================ Update Schedule by id
 
   async updateScheduleById(
     id: number,
-    schedule: IWorkSchedule
+    schedule: MonthSchedule
   ): Promise<MessageResponse> {
     await this.schedulesRepository.checkIsExist(id);
 
@@ -76,7 +76,7 @@ export class SchedulesService {
         schedule: {
           hours: { from: true, to: true },
           breakHours: { from: true, to: true },
-          days: true,
+          day: true,
         },
       },
     });

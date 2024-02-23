@@ -1,30 +1,28 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayMaxSize,
-  IsArray,
   IsDefined,
   IsNumber,
   IsOptional,
+  Max,
   Min,
   ValidateNested,
 } from 'class-validator';
-import { ISchedule, IWorkSchedule } from 'src/common/types';
+import { ISchedule, MonthSchedule } from 'src/common/types';
 import { ScheduleDto } from './workingHours.dto';
 
-export class ScheduleHoursAndDatesDto {
+export class ScheduleDayDto {
   @ValidateNested()
   @Type(() => ScheduleDto)
   hours: ISchedule;
-
-  @IsArray()
-  @ArrayMaxSize(31)
-  @IsNumber({ allowNaN: false }, { each: true })
-  days: number[];
 
   @IsOptional()
   @ValidateNested()
   @Type(() => ScheduleDto)
   breakHours: ISchedule;
+
+  @Max(31)
+  @IsNumber({ allowNaN: false })
+  day: number;
 }
 
 const date = new Date(Date.now());
@@ -48,6 +46,6 @@ export class UpdateEmployeeScheduleDto {
   month: number;
 
   @ValidateNested()
-  @Type(() => ScheduleHoursAndDatesDto)
-  schedule: IWorkSchedule;
+  @Type(() => ScheduleDayDto)
+  schedule: MonthSchedule;
 }
