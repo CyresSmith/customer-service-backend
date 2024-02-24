@@ -44,6 +44,7 @@ export class CompaniesRepository extends Repository<Company> {
         'employees.user',
         // 'employees.category',
         'activities',
+        'employees.schedules',
       ],
       where: {
         id,
@@ -64,7 +65,11 @@ export class CompaniesRepository extends Repository<Company> {
           lastName: true,
           birthday: true,
           gender: true,
-          schedules: true,
+          schedules: {
+            year: true,
+            month: true,
+            schedule: true,
+          },
           // category: {
           //   id: true,
           //   name: true,
