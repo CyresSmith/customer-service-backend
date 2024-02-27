@@ -253,6 +253,24 @@ export class CompaniesService {
                       };
                     }
 
+                    if (
+                      newItem.breakHours?.from <= companySchedule.hours.from
+                    ) {
+                      delete newItem.breakHours;
+                    }
+
+                    if (newItem.breakHours?.to >= companySchedule.hours.to) {
+                      newItem = {
+                        ...newItem,
+                        hours: {
+                          ...newItem.hours,
+                          to: companySchedule.hours.to,
+                        },
+                      };
+
+                      delete newItem.breakHours;
+                    }
+
                     return newItem;
                   }
 
