@@ -259,11 +259,6 @@ export class CompaniesService {
                   return item;
                 });
 
-              console.log(
-                '🚀 ~ CompaniesService ~ updateProfile ~ newSchedule:',
-                newSchedule
-              );
-
               acc[i] = { ...employeeMonthSchedule, schedule: newSchedule };
 
               return acc;
