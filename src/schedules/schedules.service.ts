@@ -6,6 +6,7 @@ import {
   MessageResponse,
   MonthSchedule,
 } from 'src/common/types';
+import { MoreThanOrEqual } from 'typeorm';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 
@@ -102,6 +103,31 @@ export class SchedulesService {
     } catch (error) {
       throw new MethodNotAllowedException(error);
     }
+  }
+
+  // ============================================ Get All Company Schedules From Current Month
+
+  async getAllCompanySchedulesFromCurrentMonth(
+    companyId: number
+  ): Promise<Schedule[]> {
+    const currentMonth = new Date(Date.now()).getMonth();
+
+    return await this.schedulesRepository.find({
+      where: {
+        company: { id: companyId },
+        month: MoreThanOrEqual(currentMonth),
+      },
+      select: {
+        id: true,
+        year: true,
+        month: true,
+        schedule: {
+          hours: { from: true, to: true },
+          breakHours: { from: true, to: true },
+          day: true,
+        },
+      },
+    });
   }
 
   // ============================================
