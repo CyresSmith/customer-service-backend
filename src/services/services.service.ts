@@ -36,8 +36,8 @@ export class ServicesService {
         newServiceData.avatar = createServiceDto.avatar;
       }
 
-      if (createServiceDto.breakHours) {
-        newServiceData.breakHours = createServiceDto.breakHours;
+      if (createServiceDto.break) {
+        newServiceData.break = createServiceDto.break;
       }
 
       if (createServiceDto.desc) {

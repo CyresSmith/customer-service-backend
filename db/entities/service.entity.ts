@@ -1,3 +1,4 @@
+import { EmployeesServiceSettings, ServiceType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -37,13 +38,16 @@ export class Service {
   duration: number;
 
   @Column({ nullable: true })
-  breakHours: number;
+  break: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
   @Column({ nullable: true })
   desc: string;
+
+  @Column({ type: 'jsonb', nullable: true, default: [] })
+  employeesSettings: EmployeesServiceSettings[];
 
   @Column({ type: 'jsonb', nullable: true, default: [] })
   images: string[];
@@ -65,6 +69,9 @@ export class Service {
     onUpdate: 'CASCADE',
   })
   resources: Resource[];
+
+  @Column({ nullable: false, default: 'individual' })
+  type: ServiceType;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

@@ -22,7 +22,7 @@ export class CreateServiceDto {
 
   @IsNumber()
   @IsOptional()
-  breakHours: number;
+  break: number;
 
   @IsNumber()
   @IsDefined()
