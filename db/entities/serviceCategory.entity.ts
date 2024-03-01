@@ -1,3 +1,4 @@
+import { ServiceType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -22,6 +23,9 @@ export class ServiceCategory {
 
   @Column({ nullable: false })
   name: string;
+
+  @Column({ nullable: false, default: 'individual' })
+  type: ServiceType;
 
   @OneToMany(() => Service, service => service.category)
   services: Service[];

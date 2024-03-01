@@ -6,5 +6,7 @@ export interface IBasicCategoryInfo
 export interface ICompanyCategoryInfo
   extends Pick<Category, 'id' | 'name' | 'activities'> {}
 
+export type ServiceCategoryType = 'individual' | 'group';
+
 export interface IBasicServiceCategoryInfo
-  extends Pick<ServiceCategory, 'id' | 'name'> {}
+  extends Pick<ServiceCategory, 'id' | 'name' | 'type'> {}
