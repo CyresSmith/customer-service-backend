@@ -4,7 +4,7 @@ import {
   CompaniesRepository,
 } from 'src/common/repositories';
 import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
-import { CategoryType } from 'src/common/types';
+import { CategoryType, ServiceType } from 'src/common/types';
 import {
   IBasicCategoryInfo,
   IBasicServiceCategoryInfo,
@@ -129,15 +129,16 @@ export class CategoriesService {
   async addCompanyServiceCategory(data: {
     company: { id: number };
     name: string;
+    type: ServiceType;
   }): Promise<IBasicServiceCategoryInfo> {
     await this.servicesCategoriesRepository.checkIsExist(data.name);
 
     const newServiceCategory = this.servicesCategoriesRepository.create(data);
 
-    const category =
+    const { id, name, type } =
       await this.servicesCategoriesRepository.save(newServiceCategory);
 
-    return { id: category.id, name: category.name };
+    return { id, name, type };
   }
 
   // ============================================ Get Company services categories

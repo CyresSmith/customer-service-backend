@@ -39,6 +39,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UpdateEmployeeScheduleDto } from './dto/update-employee-schedule.dto';
+import { CreateServiceCategoryDto } from 'src/categories/dto/create-service-category.dto';
 
 @Controller('company')
 export class CompaniesController {
@@ -367,7 +368,7 @@ export class CompaniesController {
   @HttpCode(200)
   async addServiceCategory(
     @Param('companyId') id: number,
-    @Body() categoryData: { name: string }
+    @Body() categoryData: CreateServiceCategoryDto
   ): Promise<IBasicServiceCategoryInfo> {
     return await this.categoriesService.addCompanyServiceCategory({
       company: { id },
