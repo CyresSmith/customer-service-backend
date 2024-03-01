@@ -5,21 +5,26 @@ import {
   CategoriesRepository,
   CompaniesRepository,
   EmployeesRepository,
+  SchedulesRepository,
   UsersRepository,
 } from 'src/common/repositories';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { EmployeeDto } from 'src/employees/dto/employee.dto';
+import { SchedulesService } from 'src/schedules/schedules.service';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
 export class CompaniesService {
   constructor(
-    private companyRepository: CompaniesRepository,
-    private employeesRepository: EmployeesRepository,
-    private usersRepository: UsersRepository,
-    private categoriesRepository: CategoriesRepository
+    private readonly companyRepository: CompaniesRepository,
+    private readonly employeesRepository: EmployeesRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly schedulesService: SchedulesService,
+    private readonly schedulesRepository: SchedulesRepository,
+    private readonly categoriesRepository: CategoriesRepository
   ) {}
 
   // ============================================ Create company
@@ -180,7 +185,7 @@ export class CompaniesService {
 
   // ============================================ Update company profile
 
-  async updateProfile(id: number, data: UpdateCompanyDto) {
+  async updateProfile(id: number, data: UpdateCompanyProfileDto) {
     const isExist = await this.companyRepository.findOneBy({ id });
 
     if (!isExist) {
@@ -198,6 +203,88 @@ export class CompaniesService {
       isExist.category = { id: category } as Category;
 
       await this.companyRepository.save(isExist);
+    }
+
+    if (data.workingHours) {
+      const allSchedules =
+        await this.schedulesService.getAllCompanySchedulesFromCurrentMonth(id);
+
+      if (allSchedules.length > 0) {
+        const companyWorkingDays = [
+          ...new Set(data.workingHours.flatMap(({ days }) => days)),
+        ];
+
+        await this.schedulesRepository.save(
+          allSchedules.reduce(
+            (acc, employeeMonthSchedule, i) => {
+              const { schedule, year, month } = employeeMonthSchedule;
+
+              const newSchedule = schedule
+                .filter(({ day }) =>
+                  companyWorkingDays.includes(
+                    new Date(year, month, day).getDay()
+                  )
+                )
+                .map(item => {
+                  const companySchedule = data.workingHours.find(({ days }) =>
+                    days.includes(new Date(year, month, item.day).getDay())
+                  );
+
+                  if (companySchedule) {
+                    let newItem = { ...item };
+
+                    if (newItem.hours.from < companySchedule.hours.from) {
+                      newItem = {
+                        ...newItem,
+                        hours: {
+                          ...newItem.hours,
+                          from: companySchedule.hours.from,
+                        },
+                      };
+                    }
+
+                    if (newItem.hours.to > companySchedule.hours.to) {
+                      newItem = {
+                        ...newItem,
+                        hours: {
+                          ...newItem.hours,
+                          to: companySchedule.hours.to,
+                        },
+                      };
+                    }
+
+                    if (
+                      newItem.breakHours?.from <= companySchedule.hours.from
+                    ) {
+                      delete newItem.breakHours;
+                    }
+
+                    if (newItem.breakHours?.to >= companySchedule.hours.to) {
+                      newItem = {
+                        ...newItem,
+                        hours: {
+                          ...newItem.hours,
+                          to: companySchedule.hours.to,
+                        },
+                      };
+
+                      delete newItem.breakHours;
+                    }
+
+                    return newItem;
+                  }
+
+                  return item;
+                });
+
+              acc[i] = { ...employeeMonthSchedule, schedule: newSchedule };
+
+              return acc;
+            },
+            [...allSchedules]
+          )
+        );
+      }
     }
 
     return await this.companyRepository.update(id, filteredData);
