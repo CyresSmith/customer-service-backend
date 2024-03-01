@@ -14,7 +14,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Activity, Company, Employee, Schedule } from 'db/entities';
+import { Activity, Company, Employee, Schedule, Service } from 'db/entities';
+import { CategoriesService } from 'src/categories/categories.service';
+import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -28,6 +30,8 @@ import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-prof
 import { EmployeesService } from 'src/employees/employees.service';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { SchedulesService } from 'src/schedules/schedules.service';
+import { CreateServiceDto } from 'src/services/dto/create-service.dto';
+import { ServicesService } from 'src/services/services.service';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo, IUserData } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
@@ -44,6 +48,8 @@ export class CompaniesController {
     private readonly userRepository: UsersRepository,
     private readonly cloudinaryService: CloudinaryService,
     private readonly employeesService: EmployeesService,
+    private readonly servicesService: ServicesService,
+    private readonly categoriesService: CategoriesService,
     private readonly schedulesService: SchedulesService
   ) {}
 
@@ -326,6 +332,47 @@ export class CompaniesController {
     );
 
     return { message: 'Графік оновлено' };
+  }
+
+  // ============================================ Add service
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post(':companyId/service')
+  @HttpCode(200)
+  async addService(
+    @Param('companyId') companyId: number,
+    @Body() createServiceDto: CreateServiceDto
+  ): Promise<Service> {
+    return await this.servicesService.create(createServiceDto, companyId);
+  }
+
+  // ============================================ Get services categories
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/services-categories')
+  @HttpCode(200)
+  async getServicesCategories(
+    @Param('companyId') companyId: number
+  ): Promise<IBasicServiceCategoryInfo[]> {
+    return await this.categoriesService.getServicesCategories(companyId);
+  }
+
+  // ============================================ Add services category
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post(':companyId/services-categories')
+  @HttpCode(200)
+  async addServiceCategory(
+    @Param('companyId') id: number,
+    @Body() categoryData: { name: string }
+  ): Promise<IBasicServiceCategoryInfo> {
+    return await this.categoriesService.addCompanyServiceCategory({
+      company: { id },
+      ...categoryData,
+    });
   }
 
   // ============================================

@@ -10,10 +10,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Category } from './category.entity';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Resource } from './resource.entity';
+import { ServiceCategory } from './serviceCategory.entity';
 
 @Entity({ name: 'Service' })
 export class Service {
@@ -52,16 +52,17 @@ export class Service {
   @Column({ type: 'jsonb', nullable: true, default: [] })
   images: string[];
 
-  @ManyToOne(() => Category, category => category.id, {
+  @ManyToOne(() => ServiceCategory, category => category.services, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'categoryId' })
   @Index()
-  category: Category;
+  category: ServiceCategory;
 
   @ManyToMany(() => Employee, employee => employee.services, {
     onUpdate: 'CASCADE',
+    nullable: true,
   })
   employees: Employee[];
 

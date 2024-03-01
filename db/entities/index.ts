@@ -8,4 +8,5 @@ export { Product } from './product.entity';
 export { Resource } from './resource.entity';
 export { Schedule } from './schedule.entity';
 export { Service } from './service.entity';
+export { ServiceCategory } from './serviceCategory.entity';
 export { User } from './user.entity';
