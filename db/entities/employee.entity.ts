@@ -83,7 +83,7 @@ export class Employee {
   @OneToMany(() => Schedule, schedule => schedule.employee)
   schedules: Schedule[];
 
-  @ManyToMany(() => Service, service => service.employees)
+  @ManyToMany(() => Service, service => service.employees, { nullable: true })
   @JoinTable({
     name: 'employee_services_service',
     joinColumn: {

@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsDefined,
@@ -5,7 +6,10 @@ import {
   IsOptional,
   IsString,
   Length,
+  ValidateNested,
 } from 'class-validator';
+import { EmployeesServiceSettings, ServiceType } from 'src/common/types';
+import { EmployeesServiceSettingsDto } from './employees-service-settings.dto';
 
 export class CreateServiceDto {
   @IsString()
@@ -22,16 +26,21 @@ export class CreateServiceDto {
 
   @IsNumber()
   @IsOptional()
-  breakHours: number;
+  break: number;
 
   @IsNumber()
   @IsDefined()
   price: number;
 
   @IsString()
-  @Length(10, 500)
+  @Length(10, 1000)
   @IsOptional()
   desc: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => EmployeesServiceSettingsDto)
+  employeesSettings: EmployeesServiceSettings[];
 
   @IsArray()
   @IsOptional()
@@ -41,11 +50,15 @@ export class CreateServiceDto {
   @IsDefined()
   category: number;
 
-  @IsArray()
   @IsOptional()
-  employees: number[];
+  @IsArray()
+  employees?: number[];
 
   @IsArray()
   @IsOptional()
-  resources: number[];
+  resources?: number[];
+
+  @IsString()
+  @IsDefined()
+  type: ServiceType;
 }
