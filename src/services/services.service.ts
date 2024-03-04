@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Category, Company, Employee, Resource, Service } from 'db/entities';
+import { Service } from 'db/entities';
 import { ServicesRepository } from 'src/common/repositories';
 import { DeepPartial } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -15,56 +15,34 @@ export class ServicesService {
     createServiceDto: CreateServiceDto,
     companyId: number
   ): Promise<Service> {
-    const { name } = createServiceDto;
+    const { name, employees, resources } = createServiceDto;
 
     await this.servicesRepository.checkIsExist(name, companyId);
 
-    const createServiceObj = (
-      createServiceDto: CreateServiceDto
-    ): DeepPartial<Service> => {
-      const { name, duration, price, category } = createServiceDto;
-
-      const newServiceData: DeepPartial<Service> = {
-        company: { id: companyId } as Company,
-        category: { id: category } as Category,
-        name,
-        duration,
-        price,
-      };
-
-      if (createServiceDto.avatar) {
-        newServiceData.avatar = createServiceDto.avatar;
-      }
-
-      if (createServiceDto.breakHours) {
-        newServiceData.breakHours = createServiceDto.breakHours;
-      }
-
-      if (createServiceDto.desc) {
-        newServiceData.desc = createServiceDto.desc;
-      }
-
-      if (createServiceDto.images && createServiceDto.images.length) {
-        newServiceData.images = createServiceDto.images;
-      }
-
-      if (createServiceDto.employees) {
-        newServiceData.employees = createServiceDto.employees.map(id => ({
-          id,
-        })) as Employee[];
-      }
-
-      if (createServiceDto.resources) {
-        newServiceData.resources = createServiceDto.resources.map(id => ({
-          id,
-        })) as Resource[];
-      }
-
-      return { ...newServiceData };
+    let createServiceObj = {
+      ...createServiceDto,
+      company: { id: companyId },
+      category: { id: createServiceDto.category },
     };
 
+    if (employees.length > 0) {
+      createServiceObj = Object.assign(createServiceObj, {
+        employees: employees.map(item => ({ id: item })),
+      });
+    } else {
+      delete createServiceObj.employees;
+    }
+
+    if (resources.length > 0) {
+      createServiceObj = Object.assign(createServiceObj, {
+        resources: resources.map(item => ({ id: item })),
+      });
+    } else {
+      delete createServiceObj.resources;
+    }
+
     const newService = this.servicesRepository.create(
-      createServiceObj(createServiceDto)
+      createServiceObj as DeepPartial<Service>
     );
 
     return await this.servicesRepository.save(newService);

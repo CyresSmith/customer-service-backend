@@ -1,3 +1,4 @@
+import { EmployeesServiceSettings, ServiceType } from 'src/common/types';
 import {
   Column,
   CreateDateColumn,
@@ -9,10 +10,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Category } from './category.entity';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Resource } from './resource.entity';
+import { ServiceCategory } from './serviceCategory.entity';
 
 @Entity({ name: 'Service' })
 export class Service {
@@ -37,7 +38,7 @@ export class Service {
   duration: number;
 
   @Column({ nullable: true })
-  breakHours: number;
+  break: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
@@ -46,18 +47,22 @@ export class Service {
   desc: string;
 
   @Column({ type: 'jsonb', nullable: true, default: [] })
+  employeesSettings: EmployeesServiceSettings[];
+
+  @Column({ type: 'jsonb', nullable: true, default: [] })
   images: string[];
 
-  @ManyToOne(() => Category, category => category.id, {
+  @ManyToOne(() => ServiceCategory, category => category.services, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'categoryId' })
   @Index()
-  category: Category;
+  category: ServiceCategory;
 
   @ManyToMany(() => Employee, employee => employee.services, {
     onUpdate: 'CASCADE',
+    nullable: true,
   })
   employees: Employee[];
 
@@ -65,6 +70,9 @@ export class Service {
     onUpdate: 'CASCADE',
   })
   resources: Resource[];
+
+  @Column({ nullable: false, default: 'individual' })
+  type: ServiceType;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

@@ -65,3 +65,11 @@ export type Role = 'user' | 'owner' | 'admin' | 'employee';
 export type Branches = 'one' | 'more';
 
 export type EmployeesCount = '2-5' | '6-9' | '10+';
+
+export type ServiceType = 'individual' | 'group';
+
+export type EmployeesServiceSettings = {
+  employeeId: number;
+  price: number;
+  duration: number;
+};

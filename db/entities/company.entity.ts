@@ -14,11 +14,12 @@ import {
 import { Action } from './action.entity';
 import { Activity } from './activity.entity';
 import { Category } from './category.entity';
+import { Client } from './client.entity';
 import { Employee } from './employee.entity';
 import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
-import { Client } from './client.entity';
+import { ServiceCategory } from './serviceCategory.entity';
 
 @Entity({ name: 'Company' })
 export class Company {
@@ -70,6 +71,9 @@ export class Company {
   @ManyToOne(() => Category, category => category.companies)
   @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @OneToMany(() => ServiceCategory, serviceCategory => serviceCategory.company)
+  servicesCategories: ServiceCategory[];
 
   @OneToMany(() => Service, service => service.company)
   services: Service[];

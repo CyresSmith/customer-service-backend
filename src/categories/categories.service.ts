@@ -3,8 +3,13 @@ import {
   CategoriesRepository,
   CompaniesRepository,
 } from 'src/common/repositories';
-import { CategoryType } from 'src/common/types';
-import { IBasicCategoryInfo, ICompanyCategoryInfo } from './categories.types';
+import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
+import { CategoryType, ServiceType } from 'src/common/types';
+import {
+  IBasicCategoryInfo,
+  IBasicServiceCategoryInfo,
+  ICompanyCategoryInfo,
+} from './categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -12,6 +17,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 export class CategoriesService {
   constructor(
     private readonly categoriesRepository: CategoriesRepository,
+    private readonly servicesCategoriesRepository: ServicesCategoriesRepository,
     private readonly companyRepository: CompaniesRepository
   ) {}
 
@@ -115,6 +121,40 @@ export class CategoriesService {
         },
       },
       order: { id: 'ASC' },
+    });
+  }
+
+  // ============================================ Add Company service category
+
+  async addCompanyServiceCategory(data: {
+    company: { id: number };
+    name: string;
+    type: ServiceType;
+  }): Promise<IBasicServiceCategoryInfo> {
+    await this.servicesCategoriesRepository.checkIsExist(data.name);
+
+    const newServiceCategory = this.servicesCategoriesRepository.create(data);
+
+    const { id, name, type } =
+      await this.servicesCategoriesRepository.save(newServiceCategory);
+
+    return { id, name, type };
+  }
+
+  // ============================================ Get Company services categories
+
+  async getServicesCategories(
+    id: number
+  ): Promise<IBasicServiceCategoryInfo[]> {
+    return await this.servicesCategoriesRepository.find({
+      where: {
+        company: { id },
+      },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+      },
     });
   }
 
