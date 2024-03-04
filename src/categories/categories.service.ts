@@ -153,6 +153,7 @@ export class CategoriesService {
       select: {
         id: true,
         name: true,
+        type: true,
       },
     });
   }
