@@ -65,11 +65,11 @@ export class CompaniesRepository extends Repository<Company> {
           lastName: true,
           birthday: true,
           gender: true,
-          schedules: {
-            year: true,
-            month: true,
-            schedule: true,
-          },
+          // schedules: {
+          //   year: true,
+          //   month: true,
+          //   schedule: true,
+          // },
           // category: {
           //   id: true,
           //   name: true,
