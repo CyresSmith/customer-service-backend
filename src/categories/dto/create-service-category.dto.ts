@@ -3,7 +3,7 @@ import { ServiceType } from 'src/common/types';
 
 export class CreateServiceCategoryDto {
   @IsString()
-  @Length(3, 20)
+  @Length(3, 50)
   name: string;
 
   @IsString()
