@@ -61,4 +61,14 @@ export class CreateServiceDto {
   @IsString()
   @IsDefined()
   type: ServiceType;
+
+  @IsOptional()
+  @IsNumber()
+  @IsDefined()
+  capacity: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsDefined()
+  placeLimit: number;
 }
