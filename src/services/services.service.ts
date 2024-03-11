@@ -84,8 +84,6 @@ export class ServicesService {
       },
     });
 
-    console.log('🚀 ~ ServicesService ~ getServices ~ services:', services);
-
     return services.map(item => ({ ...item, category: item.category.name }));
   }
 
