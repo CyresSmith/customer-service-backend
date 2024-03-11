@@ -1,3 +1,6 @@
+import { Resource } from 'db/entities';
+import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
+import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { IBasicUserInfo } from 'src/users/users.types';
 
 export type MessageResponse = {
@@ -70,6 +73,32 @@ export type ServiceType = 'individual' | 'group';
 
 export type EmployeesServiceSettings = {
   employeeId: number;
-  price: number;
-  duration: number;
+  price?: number;
+  duration?: number;
 };
+
+export type ServiceDataType = {
+  id: number;
+  name: string;
+  avatar: string | null;
+  duration: number;
+  break: number | null;
+  price: number;
+  desc: string | null;
+  employeesSettings: EmployeesServiceSettings[];
+  images: string[];
+  category: IBasicServiceCategoryInfo;
+  employees: IBasicEmployeeInfo[];
+  resources?: Resource[];
+  type: ServiceType;
+  capacity: number;
+  placeLimit: number;
+};
+
+export interface IBasicServiceInfo
+  extends Pick<
+    ServiceDataType,
+    'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type'
+  > {
+  category: string;
+}

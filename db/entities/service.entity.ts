@@ -74,10 +74,10 @@ export class Service {
   @Column({ nullable: false, default: 'individual' })
   type: ServiceType;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false, default: 1 })
   capacity: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false, default: 1 })
   placeLimit: number;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -14,16 +14,17 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Activity, Company, Employee, Schedule, Service } from 'db/entities';
+import { Activity, Company, Employee, Schedule } from 'db/entities';
 import { CategoriesService } from 'src/categories/categories.service';
 import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
+import { CreateServiceCategoryDto } from 'src/categories/dto/create-service-category.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { UsersRepository } from 'src/common/repositories';
-import { MessageResponse } from 'src/common/types';
+import { IBasicServiceInfo, MessageResponse } from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-employee.dto';
 import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
@@ -39,7 +40,6 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UpdateEmployeeScheduleDto } from './dto/update-employee-schedule.dto';
-import { CreateServiceCategoryDto } from 'src/categories/dto/create-service-category.dto';
 
 @Controller('company')
 export class CompaniesController {
@@ -344,8 +344,20 @@ export class CompaniesController {
   async addService(
     @Param('companyId') companyId: number,
     @Body() createServiceDto: CreateServiceDto
-  ): Promise<Service> {
+  ): Promise<IBasicServiceInfo> {
     return await this.servicesService.create(createServiceDto, companyId);
+  }
+
+  // ============================================ Get company services
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/services')
+  @HttpCode(200)
+  async getServices(
+    @Param('companyId') companyId: number
+  ): Promise<IBasicServiceInfo[]> {
+    return await this.servicesService.getServices(companyId);
   }
 
   // ============================================ Get services categories

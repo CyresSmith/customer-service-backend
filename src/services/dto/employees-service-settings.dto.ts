@@ -4,15 +4,13 @@ export class EmployeesServiceSettingsDto {
   @IsNumber()
   employeeId: number;
 
+  @IsOptional()
   @IsNumber()
   @IsDefined()
   duration: number;
 
+  @IsOptional()
   @IsNumber()
   @IsDefined()
   price: number;
-
-  @IsNumber()
-  @IsOptional()
-  break: number;
 }

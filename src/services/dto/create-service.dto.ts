@@ -32,9 +32,9 @@ export class CreateServiceDto {
   @IsDefined()
   price: number;
 
+  @IsOptional()
   @IsString()
   @Length(10, 1000)
-  @IsOptional()
   desc: string;
 
   @IsOptional()

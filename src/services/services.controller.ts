@@ -8,13 +8,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { Service } from 'db/entities';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { ServicesService } from './services.service';
+import { IBasicServiceInfo } from 'src/common/types';
 
 @Controller('service')
 export class ServicesController {
@@ -28,7 +28,7 @@ export class ServicesController {
   async create(
     @Param('companyId') companyId: number,
     @Body() createServiceDto: CreateServiceDto
-  ): Promise<Service> {
+  ): Promise<IBasicServiceInfo> {
     return await this.servicesService.create(createServiceDto, companyId);
   }
 
