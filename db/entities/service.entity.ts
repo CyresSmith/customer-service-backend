@@ -77,7 +77,7 @@ export class Service {
   @Column({ nullable: false, default: 1 })
   capacity: number;
 
-  @Column({ nullable: false, default: 1 })
+  @Column({ nullable: true })
   placeLimit: number;
 
   @CreateDateColumn({ type: 'timestamp' })

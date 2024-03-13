@@ -45,12 +45,23 @@ export class CompaniesRepository extends Repository<Company> {
         // 'employees.category',
         'activities',
         'employees.schedules',
+        'services',
+        'services.category',
       ],
       where: {
         id,
       },
       select: {
         activities: { id: true, name: true },
+        services: {
+          id: true,
+          name: true,
+          avatar: true,
+          duration: true,
+          price: true,
+          type: true,
+          category: { id: true, name: true },
+        },
         employees: {
           id: true,
           jobTitle: true,

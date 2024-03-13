@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Service } from 'db/entities';
 import { ServicesRepository } from 'src/common/repositories';
 import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
-import { IBasicServiceInfo } from 'src/common/types';
+import { IBasicServiceInfo, ServiceDataType } from 'src/common/types';
 import { DeepPartial } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -63,14 +63,14 @@ export class ServicesService {
       duration: service.duration,
       price: service.price,
       type: service.type,
-      category: category.name,
+      category: { id: category.id, name: category.name },
     };
   }
 
   // ============================================ get company services
 
   async getServices(companyId: number): Promise<IBasicServiceInfo[]> {
-    const services = await this.servicesRepository.find({
+    return await this.servicesRepository.find({
       where: { company: { id: companyId } },
       relations: ['category'],
       select: {
@@ -80,11 +80,43 @@ export class ServicesService {
         duration: true,
         price: true,
         type: true,
-        category: { name: true },
+        category: { id: true, name: true },
       },
     });
+  }
 
-    return services.map(item => ({ ...item, category: item.category.name }));
+  // ============================================ get company service by id
+
+  async getServiceById(
+    companyId: number,
+    serviceId: number
+  ): Promise<ServiceDataType> {
+    return await this.servicesRepository.findOne({
+      where: { company: { id: companyId }, id: serviceId },
+      relations: ['category', 'employees'],
+    });
+  }
+
+  // ============================================ update service by id
+
+  async updateService(
+    companyId: number,
+    serviceId: number,
+    data: Partial<Service>
+  ) {
+    const isExist = await this.servicesRepository.findOneBy({
+      company: { id: companyId },
+      id: serviceId,
+    });
+
+    if (!isExist) {
+      throw new BadRequestException('Service not found');
+    }
+
+    return await this.servicesRepository.update(
+      { company: { id: companyId }, id: serviceId },
+      data
+    );
   }
 
   // ============================================

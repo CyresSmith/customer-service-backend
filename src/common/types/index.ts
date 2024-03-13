@@ -100,5 +100,5 @@ export interface IBasicServiceInfo
     ServiceDataType,
     'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type'
   > {
-  category: string;
+  category: { id: number; name: string };
 }

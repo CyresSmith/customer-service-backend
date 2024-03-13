@@ -24,7 +24,11 @@ import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { UsersRepository } from 'src/common/repositories';
-import { IBasicServiceInfo, MessageResponse } from 'src/common/types';
+import {
+  IBasicServiceInfo,
+  MessageResponse,
+  ServiceDataType,
+} from 'src/common/types';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-employee.dto';
 import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
@@ -360,6 +364,19 @@ export class CompaniesController {
     return await this.servicesService.getServices(companyId);
   }
 
+  // ============================================ Get company service by id
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get(':companyId/service/:serviceId')
+  @HttpCode(200)
+  async getServiceById(
+    @Param('companyId') companyId: number,
+    @Param('serviceId') serviceId: number
+  ): Promise<ServiceDataType> {
+    return await this.servicesService.getServiceById(companyId, serviceId);
+  }
+
   // ============================================ Get services categories
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
@@ -388,6 +405,33 @@ export class CompaniesController {
     });
   }
 
+  // ============================================ Update service avatar
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  @Patch(':companyId/service/:serviceId/avatar')
+  @HttpCode(200)
+  async updateServiceAvatar(
+    @Param('companyId') companyId: number,
+    @Param('serviceId') serviceId: number,
+    @UploadedFile() avatar: Express.Multer.File
+  ): Promise<{ url: string }> {
+    const { url } = await this.cloudinaryService.uploadFile(
+      {
+        folder: `company_${companyId}_avatars`,
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        max_bytes: 5 * 1024 * 1024,
+      },
+      avatar
+    );
+
+    await this.servicesService.updateService(companyId, serviceId, {
+      avatar: url as string,
+    });
+
+    return { url };
+  }
   // ============================================
 
   @Get()
