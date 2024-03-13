@@ -47,6 +47,7 @@ export class CompaniesRepository extends Repository<Company> {
         'employees.schedules',
         'services',
         'services.category',
+        'employees.services',
       ],
       where: {
         id,
