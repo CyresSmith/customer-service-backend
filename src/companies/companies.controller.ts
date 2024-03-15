@@ -14,7 +14,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Activity, Company, Employee, Schedule } from 'db/entities';
+import {
+  Activity,
+  Company,
+  Employee,
+  Resource,
+  Schedule,
+  Service,
+  ServiceCategory,
+} from 'db/entities';
 import { CategoriesService } from 'src/categories/categories.service';
 import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
 import { CreateServiceCategoryDto } from 'src/categories/dto/create-service-category.dto';
@@ -36,6 +44,7 @@ import { EmployeesService } from 'src/employees/employees.service';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { SchedulesService } from 'src/schedules/schedules.service';
 import { CreateServiceDto } from 'src/services/dto/create-service.dto';
+import { UpdateServiceDto } from 'src/services/dto/update-service.dto';
 import { ServicesService } from 'src/services/services.service';
 import { UsersService } from 'src/users/users.service';
 import { IBasicUserInfo, IUserData } from 'src/users/users.types';
@@ -432,6 +441,53 @@ export class CompaniesController {
 
     return { url };
   }
+
+  // ============================================ Update service
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Patch(':companyId/service/:serviceId')
+  @HttpCode(200)
+  async updateService(
+    @Param('companyId') companyId: number,
+    @Param('serviceId') serviceId: number,
+    @Body() data: UpdateServiceDto
+  ): Promise<MessageResponse> {
+    let updateData: Partial<Service> = {};
+
+    if (data.category) {
+      updateData = {
+        ...updateData,
+        category: { id: data.category } as ServiceCategory,
+      };
+    }
+
+    if (data.employees && data.employees.length > 0) {
+      updateData = {
+        ...updateData,
+        employees: data.employees.map(id => ({
+          id,
+        })) as Employee[],
+      };
+    }
+
+    if (data.resources && data.resources.length > 0) {
+      updateData = {
+        ...updateData,
+        resources: data.resources.map(id => ({
+          id,
+        })) as Resource[],
+      };
+    }
+
+    await this.servicesService.updateService(companyId, serviceId, {
+      ...data,
+      ...updateData,
+    } as Partial<Service>);
+
+    return { message: 'Послугу оновлено' };
+  }
+
   // ============================================
 
   @Get()
