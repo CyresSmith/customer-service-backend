@@ -113,9 +113,17 @@ export class ServicesService {
       throw new BadRequestException('Service not found');
     }
 
+    const { employees, ...rest } = data;
+
+    if (employees) {
+      isExist.employees = employees;
+
+      await this.servicesRepository.save(isExist);
+    }
+
     return await this.servicesRepository.update(
       { company: { id: companyId }, id: serviceId },
-      data
+      rest
     );
   }
 

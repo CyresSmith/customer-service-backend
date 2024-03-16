@@ -40,7 +40,7 @@ export class Service {
   @Column({ nullable: true })
   break: number;
 
-  @Column({ type: 'numeric', nullable: false })
+  @Column({ nullable: false, default: 0 })
   price: number;
 
   @Column({ nullable: false, default: '' })
