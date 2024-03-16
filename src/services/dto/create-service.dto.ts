@@ -13,7 +13,7 @@ import { EmployeesServiceSettingsDto } from './employees-service-settings.dto';
 
 export class CreateServiceDto {
   @IsString()
-  @Length(3, 20)
+  @Length(3, 50)
   name: string;
 
   @IsString()
@@ -34,7 +34,7 @@ export class CreateServiceDto {
 
   @IsOptional()
   @IsString()
-  @Length(10, 1000)
+  @Length(30, 1000)
   desc: string;
 
   @IsOptional()

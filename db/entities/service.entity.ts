@@ -31,7 +31,7 @@ export class Service {
   @Index()
   company: Company;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false, default: '' })
   avatar: string;
 
   @Column({ nullable: false })
@@ -40,10 +40,10 @@ export class Service {
   @Column({ nullable: true })
   break: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ nullable: false, default: 0 })
   price: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false, default: '' })
   desc: string;
 
   @Column({ type: 'jsonb', nullable: true, default: [] })
