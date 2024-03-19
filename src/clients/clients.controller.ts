@@ -12,6 +12,7 @@ import {
   UploadedFile,
   Patch,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -32,10 +33,10 @@ export class ClientsController {
 
   @UseGuards(AccessTokenGuard)
   @HttpCode(201)
-  @Post(':companyId/create')
+  @Post('create')
   async create(
     @Body() createClientDto: CreateClientDto,
-    @Param('companyId') companyId: number
+    @Query('companyId') companyId: number
   ): Promise<Client> {
     const isExist = await this.clientsService.findByPhone(
       companyId,
@@ -55,27 +56,27 @@ export class ClientsController {
 
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  @Get(':companyId/get-all')
-  async findAll(@Param('companyId') companyId: number): Promise<Client[]> {
+  @Get('get-all')
+  async findAll(@Query('companyId') companyId: number): Promise<Client[]> {
     return await this.clientsService.findAll(companyId);
   }
 
   // ================================= Get company Client by id
 
-  @Get(':companyId/:id')
+  @Get(':id')
   async findById(
-    @Param('companyId') companyId: number,
-    @Param('id') id: number
+    @Param('id') id: number,
+    @Query('companyId') companyId: number
   ): Promise<Client> {
     return await this.clientsService.findById(companyId, id);
   }
 
   // ================================= Get company Client by phone
 
-  @Get(':companyId/:phone')
+  @Get(':phone')
   async findByPhone(
-    @Param('companyId') companyId: number,
-    @Param('phone') phone: string
+    @Param('phone') phone: string,
+    @Query('companyId') companyId: number
   ): Promise<Client> {
     return await this.clientsService.findByPhone(companyId, phone);
   }
@@ -83,10 +84,10 @@ export class ClientsController {
   // ================================== Update Client
 
   @UseGuards(AccessTokenGuard)
-  @Patch(':companyId/:id/update')
+  @Patch(':id/update')
   async update(
-    @Param('companyId') companyId: number,
     @Param('id') id: number,
+    @Query('companyId') companyId: number,
     @Body() updateClientDto: UpdateClientDto
   ): Promise<Client> {
     const isClient = await this.clientsService.findById(companyId, id);
@@ -107,10 +108,10 @@ export class ClientsController {
 
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  @Post(':companyId/:id/update/avatar')
+  @Post(':id/update/avatar')
   async updateAvatar(
     @Param('id') id: number,
-    @Param('companyId') companyId: number,
+    @Query('companyId') companyId: number,
     @UploadedFile() avatar: Express.Multer.File
   ): Promise<{ url: string }> {
     const isClient = await this.clientsService.findById(companyId, id);
@@ -138,10 +139,10 @@ export class ClientsController {
 
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  @Delete(':companyId/:id/delete')
+  @Delete(':id/delete')
   async remove(
     @Param('id') id: number,
-    @Param('companyId') companyId: number
+    @Query('companyId') companyId: number
   ): Promise<{ message: string }> {
     const client = await this.clientsService.findById(companyId, id);
 
