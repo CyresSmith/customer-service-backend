@@ -16,11 +16,13 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user, params } = context.switchToHttp().getRequest();
+    const { user, params, query } = context.switchToHttp().getRequest();
 
-    if (user && user?.employees && params?.companyId) {
-      const employee = user?.employees?.find(
-        employee => employee?.company?.id === +params?.companyId
+    if ((user && user?.employees && params?.companyId) || query?.companyId) {
+      const employee = user?.employees?.find(employee =>
+        employee?.company?.id === +params?.companyId
+          ? +params?.companyId
+          : +query?.companyId
       );
 
       return this.matchRoles(roles, employee.role);

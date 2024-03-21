@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Activity, Category, Company, Employee, User } from 'db/entities';
+import { Activity, Category, Company, User } from 'db/entities';
 import { RolesEnum } from 'src/common/enums';
 import {
   CategoriesRepository,
@@ -8,13 +8,13 @@ import {
   SchedulesRepository,
   UsersRepository,
 } from 'src/common/repositories';
-import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
-import { EmployeeDto } from 'src/employees/dto/employee.dto';
 import { SchedulesService } from 'src/schedules/schedules.service';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
+// import { UpdateCompanyDto } from './dto/update-company.dto';
+// import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
+// import { EmployeeDto } from 'src/employees/dto/employee.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -66,77 +66,10 @@ export class CompaniesService {
     return { id: company.id, name: company.name };
   }
 
-  // ============================================ Add exist user employee
+  // ============================================== Find one Company
 
-  async addExistUserEmployee(
-    userId: number,
-    employeeData: EmployeeDto,
-    companyId: number
-  ): Promise<Employee> {
-    const existEmployee = await this.employeesRepository.findOne({
-      where: { user: { id: userId }, company: { id: companyId } },
-    });
-
-    if (existEmployee) {
-      throw new BadRequestException('Співробітник вже зареєстровано!');
-    }
-
-    const user = await this.usersRepository.findOneBy({ id: userId });
-
-    if (!user) {
-      throw new BadRequestException('Користувач не знайдено');
-    }
-
-    const newEmployee = this.employeesRepository.create({
-      ...employeeData,
-      // category: employeeData.category as DeepPartial<Category>,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      user: userId as DeepPartial<User>,
-      company: companyId as DeepPartial<Company>,
-    });
-
-    const employee = await this.employeesRepository.save(newEmployee);
-
-    return await this.employeesRepository.getById(employee.id);
-  }
-
-  // ============================================ Check is user employee exist
-
-  async checkIsEmployeeExist(email: string, companyId: number) {
-    const employee = await this.employeesRepository.findOne({
-      where: { user: { email }, company: { id: companyId } },
-    });
-
-    if (employee) {
-      throw new BadRequestException(
-        'Співробітник з цією поштою вже зареєстровано!'
-      );
-    }
-  }
-
-  // ============================================ Add new user employee
-
-  async addNewUserEmployee(
-    userId: number,
-    createEmployeeDto: CreateEmployeeDto,
-    companyId: number
-  ): Promise<Employee> {
-    const { userData, employeeData } = createEmployeeDto;
-
-    const newEmployee = this.employeesRepository.create({
-      ...userData,
-      ...employeeData,
-      // category: employeeData.category as DeepPartial<Category>,
-      user: userId as DeepPartial<User>,
-      company: companyId as DeepPartial<Company>,
-    });
-
-    const employee = await this.employeesRepository.save(newEmployee);
-
-    return await this.employeesRepository.getById(employee.id);
+  async findOne(id: number) {
+    return await this.companyRepository.getById(id);
   }
 
   // ============================================ Get company profile
@@ -292,40 +225,18 @@ export class CompaniesService {
 
   // ============================================ Update company avatar
 
-  async checkCompanyEmployee(
-    companyId: number,
-    employeeId: number
-  ): Promise<Employee> {
-    const existEmployee = await this.employeesRepository.findOne({
-      where: {
-        id: employeeId,
-        company: { id: companyId },
-      },
-    });
-
-    if (!existEmployee) {
-      throw new BadRequestException('Користувача не існує!');
-    }
-
-    return existEmployee;
-  }
-
   // ============================================
 
-  findAll() {
-    return `This action returns all companies`;
-  }
+  // findAll() {
+  //   return `This action returns all companies`;
+  // }
 
-  findOne(id: number) {
-    return this.companyRepository.getById(id);
-  }
+  // async update(id: number, updateCompanyDto: UpdateCompanyDto) {
+  //   return 'update';
+  //   // return await this.companyRepository.update(id, updateCompanyDto);
+  // }
 
-  async update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return 'update';
-    // return await this.companyRepository.update(id, updateCompanyDto);
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} company`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} company`;
+  // }
 }

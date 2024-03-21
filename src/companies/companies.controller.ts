@@ -31,40 +31,31 @@ import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
-import { UsersRepository } from 'src/common/repositories';
 import {
   IBasicServiceInfo,
   MessageResponse,
   ServiceDataType,
 } from 'src/common/types';
-import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
-import { CreateExistUserEmployeeDto } from 'src/employees/dto/create-exist-user-employee.dto';
-import { UpdateEmployeeProfileDto } from 'src/employees/dto/update-employee-profile.dto';
-import { EmployeesService } from 'src/employees/employees.service';
-import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { SchedulesService } from 'src/schedules/schedules.service';
 import { CreateServiceDto } from 'src/services/dto/create-service.dto';
 import { UpdateServiceDto } from 'src/services/dto/update-service.dto';
 import { ServicesService } from 'src/services/services.service';
-import { UsersService } from 'src/users/users.service';
-import { IBasicUserInfo, IUserData } from 'src/users/users.types';
+import { IBasicUserInfo } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
+import { EmployeesService } from 'src/employees/employees.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UpdateEmployeeScheduleDto } from './dto/update-employee-schedule.dto';
 
 @Controller('company')
 export class CompaniesController {
   constructor(
     private readonly companiesService: CompaniesService,
-    private readonly userService: UsersService,
-    private readonly userRepository: UsersRepository,
     private readonly cloudinaryService: CloudinaryService,
-    private readonly employeesService: EmployeesService,
     private readonly servicesService: ServicesService,
     private readonly categoriesService: CategoriesService,
-    private readonly schedulesService: SchedulesService
+    private readonly schedulesService: SchedulesService,
+    private readonly employeesService: EmployeesService
   ) {}
 
   // ============================================ Register company
@@ -77,59 +68,6 @@ export class CompaniesController {
     @Request() { user }: { user: IBasicUserInfo }
   ): Promise<Partial<Company>> {
     return await this.companiesService.create(createCompanyDto, user.id);
-  }
-
-  // ============================================ Add exist user employee
-
-  @Roles(RolesEnum.OWNER)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/add-exist-user-employee')
-  @HttpCode(200)
-  async addExistUserEmployee(
-    @Param('companyId') companyId: number,
-    @Body() createEmployeeDto: CreateExistUserEmployeeDto
-  ): Promise<Employee> {
-    const { userId, employeeData } = createEmployeeDto;
-
-    return await this.companiesService.addExistUserEmployee(
-      userId,
-      employeeData,
-      companyId
-    );
-  }
-
-  // ============================================ Add new user employee
-
-  @Roles(RolesEnum.OWNER)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/add-new-user-employee')
-  @HttpCode(200)
-  async addEmployee(
-    @Param('companyId') companyId: number,
-    @Body() createEmployeeDto: CreateEmployeeDto
-  ): Promise<IBasicEmployeeInfo> {
-    const { userData, employeeData } = createEmployeeDto;
-
-    const existUser = await this.userRepository.checkIsExist(
-      userData.email,
-      userData.phone
-    );
-
-    if (existUser) {
-      return await this.companiesService.addExistUserEmployee(
-        existUser.id,
-        employeeData,
-        companyId
-      );
-    } else {
-      const { user } = await this.userService.create(userData);
-
-      return await this.companiesService.addNewUserEmployee(
-        user.id,
-        createEmployeeDto,
-        companyId
-      );
-    }
   }
 
   // ============================================ Get Company by id
@@ -206,68 +144,6 @@ export class CompaniesController {
     return { message: 'Successfully updated' };
   }
 
-  // ============================================ Find employee data
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/find-employee-data')
-  @HttpCode(200)
-  async findEmployeeData(
-    @Param('companyId') companyId: number,
-    @Body() { email }: { email: string }
-  ): Promise<IUserData> {
-    await this.companiesService.checkIsEmployeeExist(email, companyId);
-    return await this.userService.getUserDataByEmail(email);
-  }
-
-  // ============================================ Update employee avatar
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @UseInterceptors(FileInterceptor('avatar'))
-  @Patch(':companyId/employee/:employeeId/avatar')
-  @HttpCode(200)
-  async updateEmployeeAvatar(
-    @Param('companyId') companyId: number,
-    @Param('employeeId') employeeId: number,
-    @UploadedFile() avatar: Express.Multer.File
-  ): Promise<{ url: string }> {
-    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
-
-    const { url } = await this.cloudinaryService.uploadFile(
-      {
-        folder: `company_${companyId}_avatars`,
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        max_bytes: 5 * 1024 * 1024,
-      },
-      avatar
-    );
-
-    await this.employeesService.updateProfile(employeeId, {
-      avatar: url as string,
-    });
-
-    return { url };
-  }
-
-  // ============================================ Update employee profile
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Patch(':companyId/employee/:employeeId/profile')
-  @HttpCode(200)
-  async updateEmployeeData(
-    @Param('companyId') companyId: number,
-    @Param('employeeId') employeeId: number,
-    @Body() data: UpdateEmployeeProfileDto
-  ): Promise<MessageResponse> {
-    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
-
-    await this.employeesService.updateProfile(employeeId, data);
-
-    return { message: 'Профайл оновлено' };
-  }
-
   // ============================================ Update employee schedule
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
@@ -279,7 +155,7 @@ export class CompaniesController {
     @Param('employeeId') employeeId: number,
     @Body() data: UpdateEmployeeScheduleDto
   ): Promise<MessageResponse> {
-    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
     const existSchedule = await this.schedulesService.getEmployeeSchedule(
       companyId,
@@ -316,7 +192,7 @@ export class CompaniesController {
     @Query('year') year: number,
     @Query('month') month: number
   ): Promise<Schedule> {
-    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
     return await this.schedulesService.getEmployeeSchedule(
       companyId,
@@ -337,7 +213,7 @@ export class CompaniesController {
     @Param('employeeId') employeeId: number,
     @Param('scheduleId') scheduleId: number
   ): Promise<MessageResponse> {
-    await this.companiesService.checkCompanyEmployee(companyId, employeeId);
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
     await this.schedulesService.deleteScheduleById(
       scheduleId,
@@ -490,18 +366,18 @@ export class CompaniesController {
 
   // ============================================
 
-  @Get()
-  findAll() {
-    return this.companiesService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.companiesService.findAll();
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companiesService.update(+id, updateCompanyDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
+  //   return this.companiesService.update(+id, updateCompanyDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companiesService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.companiesService.remove(+id);
+  // }
 }
