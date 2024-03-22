@@ -11,20 +11,20 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { EmployeesService } from './employees.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Employee } from 'db/entities';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
-import { CreateExistUserEmployeeDto } from './dto/create-exist-user-employee.dto';
-import { Employee } from 'db/entities';
-import { IBasicEmployeeInfo } from './employees.types';
 import { UsersRepository } from 'src/common/repositories';
 import { UsersService } from 'src/users/users.service';
 import { IUserData } from 'src/users/users.types';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { CreateExistUserEmployeeDto } from './dto/create-exist-user-employee.dto';
 import { UpdateEmployeeProfileDto } from './dto/update-employee-profile.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { EmployeesService } from './employees.service';
+import { IBasicEmployee, IBasicEmployeeInfo } from './employees.types';
 
 @Controller('employees')
 export class EmployeesController {
@@ -54,7 +54,7 @@ export class EmployeesController {
   @HttpCode(200)
   async getAllFromCompany(
     @Query('companyId') companyId: number
-  ): Promise<Employee[]> {
+  ): Promise<IBasicEmployee[]> {
     return this.employeesService.getAllFromCompany(companyId);
   }
 

@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Company, Employee, User } from 'db/entities';
 import { EmployeesRepository, UsersRepository } from 'src/common/repositories';
+import { DeepPartial } from 'typeorm';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeeDto } from './dto/employee.dto';
-import { Company, Employee, User } from 'db/entities';
-import { DeepPartial } from 'typeorm';
 import { UpdateEmployeeProfileDto } from './dto/update-employee-profile.dto';
+import { IBasicEmployee } from './employees.types';
 // import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
@@ -22,11 +23,12 @@ export class EmployeesService {
 
   // ============================================ Get all employees from Company
 
-  async getAllFromCompany(companyId: number) {
-    return await this.employeesRepository.find({
+  async getAllFromCompany(companyId: number): Promise<IBasicEmployee[]> {
+    const employeesData = await this.employeesRepository.find({
       where: {
         company: { id: companyId },
       },
+      relations: ['user', 'services'],
       select: {
         id: true,
         firstName: true,
@@ -34,8 +36,22 @@ export class EmployeesService {
         jobTitle: true,
         status: true,
         avatar: true,
+        services: { id: true },
+        user: {
+          firstName: true,
+          lastName: true,
+        },
       },
     });
+
+    return employeesData.map(
+      ({ firstName, lastName, user, services, ...rest }) => ({
+        ...rest,
+        firstName: firstName || user.firstName,
+        lastName: lastName || user.lastName,
+        servicesCount: services.length,
+      })
+    );
   }
 
   // ============================================ Check is user employee exist

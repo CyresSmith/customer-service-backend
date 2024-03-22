@@ -13,3 +13,11 @@ export interface IBasicEmployeeInfo
     | 'phone'
     | 'email'
   > {}
+
+export interface IBasicEmployee
+  extends Pick<
+    Employee,
+    'id' | 'avatar' | 'firstName' | 'lastName' | 'status' | 'jobTitle'
+  > {
+  servicesCount: number;
+}
