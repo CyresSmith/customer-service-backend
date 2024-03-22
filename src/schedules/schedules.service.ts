@@ -7,8 +7,8 @@ import {
   MonthSchedule,
 } from 'src/common/types';
 import { MoreThanOrEqual } from 'typeorm';
-import { CreateScheduleDto } from './dto/create-schedule.dto';
-import { UpdateScheduleDto } from './dto/update-schedule.dto';
+// import { CreateScheduleDto } from './dto/create-schedule.dto';
+// import { UpdateScheduleDto } from './dto/update-schedule.dto';
 
 @Injectable()
 export class SchedulesService {
@@ -83,6 +83,33 @@ export class SchedulesService {
     });
   }
 
+  // ============================================ Get Company schedules
+
+  async getAllSchedules(
+    companyId: number,
+    year: number,
+    month: number
+  ): Promise<Schedule[]> {
+    return await this.schedulesRepository.find({
+      where: {
+        company: { id: companyId },
+        type: 'employee',
+        year,
+        month,
+      },
+      select: {
+        id: true,
+        year: true,
+        month: true,
+        schedule: {
+          hours: { from: true, to: true },
+          breakHours: { from: true, to: true },
+          day: true,
+        },
+      },
+    });
+  }
+
   // ============================================ Delete Employee Schedule
 
   async deleteScheduleById(
@@ -132,27 +159,27 @@ export class SchedulesService {
 
   // ============================================
 
-  create(createScheduleDto: CreateScheduleDto) {
-    return 'This action adds a new schedule';
-  }
+  // create(createScheduleDto: CreateScheduleDto) {
+  //   return 'This action adds a new schedule';
+  // }
 
-  findAll() {
-    return `This action returns all schedules`;
-  }
+  // findAll() {
+  //   return `This action returns all schedules`;
+  // }
 
-  async findOne(id: number, companyId: number): Promise<Schedule> {
-    return await this.schedulesRepository.findOneBy({
-      id,
-      company: { id: companyId },
-      type: 'employee',
-    });
-  }
+  // async findOne(id: number, companyId: number): Promise<Schedule> {
+  //   return await this.schedulesRepository.findOneBy({
+  //     id,
+  //     company: { id: companyId },
+  //     type: 'employee',
+  //   });
+  // }
 
-  update(id: number, updateScheduleDto: UpdateScheduleDto) {
-    return `This action updates a #${id} schedule`;
-  }
+  // update(id: number, updateScheduleDto: UpdateScheduleDto) {
+  //   return `This action updates a #${id} schedule`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} schedule`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} schedule`;
+  // }
 }

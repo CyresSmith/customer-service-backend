@@ -3,43 +3,149 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
-  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateScheduleDto } from './dto/create-schedule.dto';
-import { UpdateScheduleDto } from './dto/update-schedule.dto';
+// import { CreateScheduleDto } from './dto/create-schedule.dto';
+// import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { SchedulesService } from './schedules.service';
+import { Roles } from 'src/common/decorators';
+import { RolesEnum } from 'src/common/enums';
+import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
+import { UpdateEmployeeScheduleDto } from 'src/companies/dto/update-employee-schedule.dto';
+import { MessageResponse } from 'src/common/types';
+import { EmployeesService } from 'src/employees/employees.service';
+import { Schedule } from 'db/entities';
 
 @Controller('schedules')
 export class SchedulesController {
-  constructor(private readonly schedulesService: SchedulesService) {}
+  constructor(
+    private readonly schedulesService: SchedulesService,
+    private readonly employeesService: EmployeesService
+  ) {}
 
-  @Post()
-  create(@Body() createScheduleDto: CreateScheduleDto) {
-    return this.schedulesService.create(createScheduleDto);
+  // ============================================ Get Company schedules
+
+  @UseGuards(AccessTokenGuard)
+  @Get('get-all/:companyId')
+  @HttpCode(200)
+  async getAllSchedules(
+    @Param('companyId') companyId: number,
+    @Query('year') year: number,
+    @Query('month') month: number
+  ): Promise<Schedule[]> {
+    return await this.schedulesService.getAllSchedules(companyId, year, month);
+  }
+  // ============================================ Update employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Patch('update/:employeeId')
+  @HttpCode(200)
+  async updateEmployeeSchedule(
+    @Query('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: UpdateEmployeeScheduleDto
+  ): Promise<MessageResponse> {
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
+
+    const existSchedule = await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      data?.year,
+      data?.month
+    );
+
+    if (existSchedule) {
+      await this.schedulesService.updateScheduleById(
+        existSchedule.id,
+        data.schedule
+      );
+    } else {
+      await this.schedulesService.createEmployeeSchedule({
+        ...data,
+        companyId,
+        employeeId,
+      });
+    }
+
+    return { message: 'Графік оновлено' };
   }
 
-  @Get()
-  findAll() {
-    return this.schedulesService.findAll();
+  // ============================================ Get employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('get/:employeeId')
+  @HttpCode(200)
+  async getEmployeeSchedule(
+    @Param('employeeId') employeeId: number,
+    @Query('companyId') companyId: number,
+    @Query('year') year: number,
+    @Query('month') month: number
+  ): Promise<Schedule> {
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
+
+    return await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      year,
+      month
+    );
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    // return this.schedulesService.findOne(+id);
+  // ============================================ Delete employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Delete('delete/:employeeId/:scheduleId')
+  @HttpCode(200)
+  async deleteEmployeeSchedule(
+    @Query('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Param('scheduleId') scheduleId: number
+  ): Promise<MessageResponse> {
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
+
+    await this.schedulesService.deleteScheduleById(
+      scheduleId,
+      companyId,
+      employeeId
+    );
+
+    return { message: 'Графік оновлено' };
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateScheduleDto: UpdateScheduleDto
-  ) {
-    return this.schedulesService.update(+id, updateScheduleDto);
-  }
+  // ==========================================================
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.schedulesService.remove(+id);
-  }
+  // @Post()
+  // create(@Body() createScheduleDto: CreateScheduleDto) {
+  //   return this.schedulesService.create(createScheduleDto);
+  // }
+
+  // @Get()
+  // findAll() {
+  //   return this.schedulesService.findAll();
+  // }
+
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   // return this.schedulesService.findOne(+id);
+  // }
+
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateScheduleDto: UpdateScheduleDto
+  // ) {
+  //   return this.schedulesService.update(+id, updateScheduleDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.schedulesService.remove(+id);
+  // }
 }
