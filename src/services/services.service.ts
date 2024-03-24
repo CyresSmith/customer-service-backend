@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Service } from 'db/entities';
-import { ServicesRepository } from 'src/common/repositories';
+import {
+  EmployeesRepository,
+  ServicesRepository,
+} from 'src/common/repositories';
 import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
 import { IBasicServiceInfo, ServiceDataType } from 'src/common/types';
 import { DeepPartial } from 'typeorm';
@@ -11,7 +14,8 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 export class ServicesService {
   constructor(
     private readonly servicesRepository: ServicesRepository,
-    private readonly servicesCategoriesRepository: ServicesCategoriesRepository
+    private readonly servicesCategoriesRepository: ServicesCategoriesRepository,
+    private readonly employeesRepository: EmployeesRepository
   ) {}
 
   // ============================================ Create new service
@@ -127,6 +131,24 @@ export class ServicesService {
     );
   }
 
+  // ============================================ delete service
+
+  async remove(companyId: number, serviceId: number) {
+    const isExist = await this.servicesRepository.findOneBy({
+      company: { id: companyId },
+      id: serviceId,
+    });
+
+    if (!isExist) {
+      throw new BadRequestException('Service not found');
+    }
+
+    return await this.servicesRepository.delete({
+      company: { id: companyId },
+      id: serviceId,
+    });
+  }
+
   // ============================================
 
   findAll() {
@@ -139,9 +161,5 @@ export class ServicesService {
 
   update(id: number, updateServiceDto: UpdateServiceDto) {
     return `This action updates a #${id} service`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} service`;
   }
 }

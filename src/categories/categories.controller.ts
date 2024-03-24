@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from 'src/common/decorators';
@@ -14,8 +15,13 @@ import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
 import { CategoryType } from 'src/common/types';
 import { CategoriesService } from './categories.service';
-import { IBasicCategoryInfo, ICompanyCategoryInfo } from './categories.types';
+import {
+  IBasicCategoryInfo,
+  IBasicServiceCategoryInfo,
+  ICompanyCategoryInfo,
+} from './categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateServiceCategoryDto } from './dto/create-service-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('category')
@@ -86,6 +92,34 @@ export class CategoriesController {
   @HttpCode(200)
   async findCompanyCategories(): Promise<ICompanyCategoryInfo[]> {
     return await this.categoriesService.findCompanyCategories();
+  }
+
+  // ============================================ Get services categories
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Get('services')
+  @HttpCode(200)
+  async getServicesCategories(
+    @Query('companyId') companyId: number
+  ): Promise<IBasicServiceCategoryInfo[]> {
+    return await this.categoriesService.getServicesCategories(companyId);
+  }
+
+  // ============================================ Add services category
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Post('services')
+  @HttpCode(200)
+  async addServiceCategory(
+    @Query('companyId') id: number,
+    @Body() categoryData: CreateServiceCategoryDto
+  ): Promise<IBasicServiceCategoryInfo> {
+    return await this.categoriesService.addCompanyServiceCategory({
+      company: { id },
+      ...categoryData,
+    });
   }
 
   // ============================================

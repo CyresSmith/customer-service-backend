@@ -15,8 +15,6 @@ export class EmployeesRepository extends Repository<Employee> {
       user: { id: userId },
     });
 
-    console.log('🚀 ~ EmployeesRepository ~ checkIsExist ~ isExist:', isExist);
-
     if (isExist) {
       throw new BadRequestException(
         `Employee for user ${userId} is already exist`

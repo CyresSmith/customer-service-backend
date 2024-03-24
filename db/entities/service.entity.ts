@@ -61,12 +61,14 @@ export class Service {
   category: ServiceCategory;
 
   @ManyToMany(() => Employee, employee => employee.services, {
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     nullable: true,
   })
   employees: Employee[];
 
   @ManyToMany(() => Resource, resource => resource.services, {
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   resources: Resource[];

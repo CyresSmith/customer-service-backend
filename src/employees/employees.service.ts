@@ -153,6 +153,31 @@ export class EmployeesService {
     return await this.employeesRepository.update(id, data);
   }
 
+  // ======================================== Remove employee service
+
+  async removeEmployeeService(
+    companyId: number,
+    serviceId: number,
+    employeeId: number
+  ) {
+    const isExist = await this.employeesRepository.findOne({
+      where: {
+        id: employeeId,
+        company: { id: companyId },
+      },
+      relations: ['services'],
+    });
+    console.log('🚀 ~ EmployeesService ~ isExist:', isExist);
+
+    if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+
+    isExist.services = isExist.services.filter(({ id }) => +id !== +serviceId);
+
+    console.log('🚀 ~ EmployeesService ~ isExist:', isExist);
+
+    return await this.employeesRepository.save(isExist);
+  }
+
   // ================================================
 
   // create(createEmployeeDto: CreateEmployeeDto) {
