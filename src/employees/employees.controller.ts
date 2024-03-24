@@ -133,7 +133,7 @@ export class EmployeesController {
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  @Patch('update/:employeeId/avatar')
+  @Patch(':employeeId/update/avatar')
   @HttpCode(200)
   async updateEmployeeAvatar(
     @Query('companyId') companyId: number,
@@ -162,7 +162,7 @@ export class EmployeesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
-  @Patch('update/:employeeId')
+  @Patch(':employeeId/update')
   @HttpCode(200)
   async updateEmployeeData(
     @Query('companyId') companyId: number,
@@ -190,6 +190,26 @@ export class EmployeesController {
     await this.employeesService.removeEmployeeService(
       companyId,
       serviceId,
+      employeeId
+    );
+
+    return { message: 'Сервіс видалено' };
+  }
+
+  // ============================================ Add employee service
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
+  @Patch(':employeeId/service')
+  @HttpCode(200)
+  async addEmployeeService(
+    @Query('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: { services: number[] }
+  ): Promise<MessageResponse> {
+    await this.employeesService.addEmployeeService(
+      companyId,
+      data.services,
       employeeId
     );
 

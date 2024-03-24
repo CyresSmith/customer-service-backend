@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Company, Employee, User } from 'db/entities';
+import { Company, Employee, Service, User } from 'db/entities';
 import { EmployeesRepository, UsersRepository } from 'src/common/repositories';
 import { DeepPartial } from 'typeorm';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -167,13 +167,37 @@ export class EmployeesService {
       },
       relations: ['services'],
     });
-    console.log('🚀 ~ EmployeesService ~ isExist:', isExist);
 
     if (!isExist) throw new BadRequestException('Співробітника не знайдено');
 
     isExist.services = isExist.services.filter(({ id }) => +id !== +serviceId);
 
-    console.log('🚀 ~ EmployeesService ~ isExist:', isExist);
+    return await this.employeesRepository.save(isExist);
+  }
+
+  // ======================================== Add employee service
+
+  async addEmployeeService(
+    companyId: number,
+    services: number[],
+    employeeId: number
+  ) {
+    const isExist = await this.employeesRepository.findOne({
+      where: {
+        id: employeeId,
+        company: { id: companyId },
+      },
+      relations: ['services'],
+    });
+
+    if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+
+    isExist.services = [
+      ...isExist.services,
+      ...(services.map(id => ({
+        id,
+      })) as Service[]),
+    ];
 
     return await this.employeesRepository.save(isExist);
   }

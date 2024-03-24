@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { RolesEnum } from '../enums';
 
 @Injectable()
 export class OnlyUserEmployeesGuard implements CanActivate {
@@ -24,6 +25,20 @@ export class OnlyUserEmployeesGuard implements CanActivate {
       params?.employeeId &&
       (params?.companyId || query?.companyId)
     ) {
+      const userEmployee = user?.employees?.find(employee =>
+        employee?.company?.id === +params?.companyId
+          ? +params?.companyId
+          : +query?.companyId
+      );
+
+      if (
+        userEmployee &&
+        (userEmployee.role === RolesEnum.OWNER ||
+          userEmployee.role === RolesEnum.ADMIN)
+      ) {
+        return true;
+      }
+
       const employee = user.employees.find(
         ({ id }) => +id === +params.employeeId
       );
