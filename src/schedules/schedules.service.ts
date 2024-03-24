@@ -64,14 +64,15 @@ export class SchedulesService {
   ): Promise<Schedule> {
     return await this.schedulesRepository.findOne({
       where: {
-        company: { id: companyId },
         employee: { id: employeeId },
+        company: { id: companyId },
         type: 'employee',
         year,
         month,
       },
       select: {
         id: true,
+        employee: { id: true },
         year: true,
         month: true,
         schedule: {
@@ -91,6 +92,7 @@ export class SchedulesService {
     month: number
   ): Promise<Schedule[]> {
     return await this.schedulesRepository.find({
+      relations: ['employee'],
       where: {
         company: { id: companyId },
         type: 'employee',
@@ -101,6 +103,7 @@ export class SchedulesService {
         id: true,
         year: true,
         month: true,
+        employee: { id: true },
         schedule: {
           hours: { from: true, to: true },
           breakHours: { from: true, to: true },

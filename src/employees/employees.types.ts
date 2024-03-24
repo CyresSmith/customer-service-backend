@@ -12,6 +12,7 @@ export interface IBasicEmployeeInfo
     | 'lastName'
     | 'phone'
     | 'email'
+    | 'provider'
   > {}
 
 export interface IBasicEmployee

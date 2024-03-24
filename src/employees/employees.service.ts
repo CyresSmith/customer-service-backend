@@ -37,6 +37,7 @@ export class EmployeesService {
         status: true,
         avatar: true,
         services: { id: true },
+        provider: true,
         user: {
           firstName: true,
           lastName: true,

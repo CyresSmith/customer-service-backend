@@ -86,7 +86,7 @@ export class SchedulesController {
     @Query('companyId') companyId: number,
     @Query('year') year: number,
     @Query('month') month: number
-  ): Promise<Schedule> {
+  ): Promise<Schedule | null> {
     await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
     return await this.schedulesService.getEmployeeSchedule(
