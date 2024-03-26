@@ -196,18 +196,18 @@ export class EmployeesController {
     return { message: 'Сервіс видалено' };
   }
 
-  // ============================================ Add employee service
+  // ============================================ Update employee services
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
   @Patch(':employeeId/service')
   @HttpCode(200)
-  async addEmployeeService(
+  async updateEmployeeServices(
     @Query('companyId') companyId: number,
     @Param('employeeId') employeeId: number,
     @Body() data: { services: number[] }
   ): Promise<MessageResponse> {
-    await this.employeesService.addEmployeeService(
+    await this.employeesService.updateEmployeeServices(
       companyId,
       data.services,
       employeeId

@@ -124,7 +124,7 @@ export class ServicesController {
       updateData = {
         ...updateData,
         employees: data.employees.map(id => ({
-          id,
+          id: +id,
         })) as Employee[],
       };
     }
