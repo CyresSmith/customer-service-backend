@@ -177,7 +177,7 @@ export class EmployeesService {
 
   // ======================================== Add employee service
 
-  async addEmployeeService(
+  async updateEmployeeServices(
     companyId: number,
     services: number[],
     employeeId: number
@@ -192,12 +192,9 @@ export class EmployeesService {
 
     if (!isExist) throw new BadRequestException('Співробітника не знайдено');
 
-    isExist.services = [
-      ...isExist.services,
-      ...(services.map(id => ({
-        id,
-      })) as Service[]),
-    ];
+    isExist.services = services.map(id => ({
+      id,
+    })) as Service[];
 
     return await this.employeesRepository.save(isExist);
   }
