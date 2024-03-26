@@ -133,7 +133,7 @@ export class EmployeesController {
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  @Patch(':employeeId/update/avatar')
+  @Patch('update/:employeeId/avatar')
   @HttpCode(200)
   async updateEmployeeAvatar(
     @Query('companyId') companyId: number,
@@ -162,7 +162,7 @@ export class EmployeesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
-  @Patch(':employeeId/update')
+  @Patch('update/:employeeId')
   @HttpCode(200)
   async updateEmployeeData(
     @Query('companyId') companyId: number,

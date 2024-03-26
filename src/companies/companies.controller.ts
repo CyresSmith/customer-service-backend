@@ -12,29 +12,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  Activity,
-  Company,
-  Employee,
-  Resource,
-  Service,
-  ServiceCategory,
-} from 'db/entities';
+import { Activity, Company } from 'db/entities';
 import { CategoriesService } from 'src/categories/categories.service';
-import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
-import { CreateServiceCategoryDto } from 'src/categories/dto/create-service-category.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { RolesGuard } from 'src/common/guards';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
-import {
-  IBasicServiceInfo,
-  MessageResponse,
-  ServiceDataType,
-} from 'src/common/types';
-import { CreateServiceDto } from 'src/services/dto/create-service.dto';
-import { UpdateServiceDto } from 'src/services/dto/update-service.dto';
+import { MessageResponse } from 'src/common/types';
 import { ServicesService } from 'src/services/services.service';
 import { IBasicUserInfo } from 'src/users/users.types';
 import { CompaniesService } from './companies.service';
@@ -134,86 +119,6 @@ export class CompaniesController {
     await this.companiesService.updateProfile(companyId, data);
 
     return { message: 'Successfully updated' };
-  }
-
-  // ============================================ Update employee schedule
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Patch(':companyId/employee/:employeeId/schedule')
-  @HttpCode(200)
-  async updateEmployeeSchedule(
-    @Param('companyId') companyId: number,
-    @Param('employeeId') employeeId: number,
-    @Body() data: UpdateEmployeeScheduleDto
-  ): Promise<MessageResponse> {
-    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
-
-    const existSchedule = await this.schedulesService.getEmployeeSchedule(
-      companyId,
-      employeeId,
-      data?.year,
-      data?.month
-    );
-
-    if (existSchedule) {
-      await this.schedulesService.updateScheduleById(
-        existSchedule.id,
-        data.schedule
-      );
-    } else {
-      await this.schedulesService.createEmployeeSchedule({
-        ...data,
-        companyId,
-        employeeId,
-      });
-    }
-
-    return { message: 'Графік оновлено' };
-  }
-
-  // ============================================ Get employee schedule
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get(':companyId/employee/:employeeId/schedule')
-  @HttpCode(200)
-  async getEmployeeSchedule(
-    @Param('companyId') companyId: number,
-    @Param('employeeId') employeeId: number,
-    @Query('year') year: number,
-    @Query('month') month: number
-  ): Promise<Schedule> {
-    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
-
-    return await this.schedulesService.getEmployeeSchedule(
-      companyId,
-      employeeId,
-      year,
-      month
-    );
-  }
-
-  // ============================================ Delete employee schedule
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Delete(':companyId/employee/:employeeId/schedule/:scheduleId')
-  @HttpCode(200)
-  async deleteEmployeeSchedule(
-    @Param('companyId') companyId: number,
-    @Param('employeeId') employeeId: number,
-    @Param('scheduleId') scheduleId: number
-  ): Promise<MessageResponse> {
-    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
-
-    await this.schedulesService.deleteScheduleById(
-      scheduleId,
-      companyId,
-      employeeId
-    );
-
-    return { message: 'Графік оновлено' };
   }
 
   // ============================================
