@@ -136,144 +136,84 @@ export class CompaniesController {
     return { message: 'Successfully updated' };
   }
 
-  // ============================================ Add service
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/service')
-  @HttpCode(200)
-  async addService(
-    @Param('companyId') companyId: number,
-    @Body() createServiceDto: CreateServiceDto
-  ): Promise<IBasicServiceInfo> {
-    return await this.servicesService.create(createServiceDto, companyId);
-  }
-
-  // ============================================ Get company services
+  // ============================================ Update employee schedule
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get(':companyId/services')
+  @Patch(':companyId/employee/:employeeId/schedule')
   @HttpCode(200)
-  async getServices(
-    @Param('companyId') companyId: number
-  ): Promise<IBasicServiceInfo[]> {
-    return await this.servicesService.getServices(companyId);
-  }
-
-  // ============================================ Get company service by id
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get(':companyId/service/:serviceId')
-  @HttpCode(200)
-  async getServiceById(
+  async updateEmployeeSchedule(
     @Param('companyId') companyId: number,
-    @Param('serviceId') serviceId: number
-  ): Promise<ServiceDataType> {
-    return await this.servicesService.getServiceById(companyId, serviceId);
-  }
+    @Param('employeeId') employeeId: number,
+    @Body() data: UpdateEmployeeScheduleDto
+  ): Promise<MessageResponse> {
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
-  // ============================================ Get services categories
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get(':companyId/services-categories')
-  @HttpCode(200)
-  async getServicesCategories(
-    @Param('companyId') companyId: number
-  ): Promise<IBasicServiceCategoryInfo[]> {
-    return await this.categoriesService.getServicesCategories(companyId);
-  }
-
-  // ============================================ Add services category
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post(':companyId/services-categories')
-  @HttpCode(200)
-  async addServiceCategory(
-    @Param('companyId') id: number,
-    @Body() categoryData: CreateServiceCategoryDto
-  ): Promise<IBasicServiceCategoryInfo> {
-    return await this.categoriesService.addCompanyServiceCategory({
-      company: { id },
-      ...categoryData,
-    });
-  }
-
-  // ============================================ Update service avatar
-
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @UseInterceptors(FileInterceptor('avatar'))
-  @Patch(':companyId/service/:serviceId/avatar')
-  @HttpCode(200)
-  async updateServiceAvatar(
-    @Param('companyId') companyId: number,
-    @Param('serviceId') serviceId: number,
-    @UploadedFile() avatar: Express.Multer.File
-  ): Promise<{ url: string }> {
-    const { url } = await this.cloudinaryService.uploadFile(
-      {
-        folder: `company_${companyId}_avatars`,
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        max_bytes: 5 * 1024 * 1024,
-      },
-      avatar
+    const existSchedule = await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      data?.year,
+      data?.month
     );
 
-    await this.servicesService.updateService(companyId, serviceId, {
-      avatar: url as string,
-    });
+    if (existSchedule) {
+      await this.schedulesService.updateScheduleById(
+        existSchedule.id,
+        data.schedule
+      );
+    } else {
+      await this.schedulesService.createEmployeeSchedule({
+        ...data,
+        companyId,
+        employeeId,
+      });
+    }
 
-    return { url };
+    return { message: 'Графік оновлено' };
   }
 
-  // ============================================ Update service
+  // ============================================ Get employee schedule
 
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Patch(':companyId/service/:serviceId')
+  @Get(':companyId/employee/:employeeId/schedule')
   @HttpCode(200)
-  async updateService(
+  async getEmployeeSchedule(
     @Param('companyId') companyId: number,
-    @Param('serviceId') serviceId: number,
-    @Body() data: UpdateServiceDto
+    @Param('employeeId') employeeId: number,
+    @Query('year') year: number,
+    @Query('month') month: number
+  ): Promise<Schedule> {
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
+
+    return await this.schedulesService.getEmployeeSchedule(
+      companyId,
+      employeeId,
+      year,
+      month
+    );
+  }
+
+  // ============================================ Delete employee schedule
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Delete(':companyId/employee/:employeeId/schedule/:scheduleId')
+  @HttpCode(200)
+  async deleteEmployeeSchedule(
+    @Param('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Param('scheduleId') scheduleId: number
   ): Promise<MessageResponse> {
-    let updateData: Partial<Service> = {};
+    await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
-    if (data.category) {
-      updateData = {
-        ...updateData,
-        category: { id: data.category } as ServiceCategory,
-      };
-    }
+    await this.schedulesService.deleteScheduleById(
+      scheduleId,
+      companyId,
+      employeeId
+    );
 
-    if (data.employees && data.employees.length > 0) {
-      updateData = {
-        ...updateData,
-        employees: data.employees.map(id => ({
-          id,
-        })) as Employee[],
-      };
-    }
-
-    if (data.resources && data.resources.length > 0) {
-      updateData = {
-        ...updateData,
-        resources: data.resources.map(id => ({
-          id,
-        })) as Resource[],
-      };
-    }
-
-    await this.servicesService.updateService(companyId, serviceId, {
-      ...data,
-      ...updateData,
-    } as Partial<Service>);
-
-    return { message: 'Послугу оновлено' };
+    return { message: 'Графік оновлено' };
   }
 
   // ============================================

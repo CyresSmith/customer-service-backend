@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -17,7 +18,9 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
+import { OnlyUserEmployeesGuard } from 'src/common/guards/onlyUserEmployees.guard';
 import { UsersRepository } from 'src/common/repositories';
+import { MessageResponse } from 'src/common/types';
 import { UsersService } from 'src/users/users.service';
 import { IUserData } from 'src/users/users.types';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -127,10 +130,10 @@ export class EmployeesController {
 
   // ============================================ Update employee avatar
 
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  @Patch('update/:employeeId/avatar')
+  @Patch(':employeeId/update/avatar')
   @HttpCode(200)
   async updateEmployeeAvatar(
     @Query('companyId') companyId: number,
@@ -157,9 +160,9 @@ export class EmployeesController {
 
   // ============================================ Update employee profile
 
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Patch('update/:employeeId')
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
+  @Patch(':employeeId/update')
   @HttpCode(200)
   async updateEmployeeData(
     @Query('companyId') companyId: number,
@@ -171,6 +174,46 @@ export class EmployeesController {
     await this.employeesService.updateProfile(employeeId, data);
 
     return await this.employeesService.getOne(companyId, employeeId);
+  }
+
+  // ============================================ Remove employee service
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
+  @Delete(':employeeId/service/:serviceId')
+  @HttpCode(200)
+  async removeEmployeeService(
+    @Query('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Param('serviceId') serviceId: number
+  ): Promise<MessageResponse> {
+    await this.employeesService.removeEmployeeService(
+      companyId,
+      serviceId,
+      employeeId
+    );
+
+    return { message: 'Сервіс видалено' };
+  }
+
+  // ============================================ Add employee service
+
+  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+  @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
+  @Patch(':employeeId/service')
+  @HttpCode(200)
+  async addEmployeeService(
+    @Query('companyId') companyId: number,
+    @Param('employeeId') employeeId: number,
+    @Body() data: { services: number[] }
+  ): Promise<MessageResponse> {
+    await this.employeesService.addEmployeeService(
+      companyId,
+      data.services,
+      employeeId
+    );
+
+    return { message: 'Сервіс видалено' };
   }
 
   // ==================================================================
