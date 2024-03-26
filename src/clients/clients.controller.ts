@@ -63,7 +63,7 @@ export class ClientsController {
 
   // ================================= Get company Client by id
 
-  @Get(':id')
+  @Get(':id/one-by-id')
   async findById(
     @Param('id') id: number,
     @Query('companyId') companyId: number
@@ -73,7 +73,7 @@ export class ClientsController {
 
   // ================================= Get company Client by phone
 
-  @Get(':phone')
+  @Get(':phone/one-by-phone')
   async findByPhone(
     @Param('phone') phone: string,
     @Query('companyId') companyId: number

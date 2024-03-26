@@ -41,7 +41,7 @@ export class EmployeesController {
   // ============================================ Get one
 
   @UseGuards(AccessTokenGuard)
-  @Get('get-one/:id')
+  @Get(':id/get-one')
   @HttpCode(200)
   async getOne(
     @Param('id') id: number,
@@ -133,7 +133,7 @@ export class EmployeesController {
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
   @UseInterceptors(FileInterceptor('avatar'))
-  @Patch('update/:employeeId/avatar')
+  @Patch(':employeeId/update/avatar')
   @HttpCode(200)
   async updateEmployeeAvatar(
     @Query('companyId') companyId: number,
@@ -162,7 +162,7 @@ export class EmployeesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard, OnlyUserEmployeesGuard)
-  @Patch('update/:employeeId')
+  @Patch(':employeeId/update')
   @HttpCode(200)
   async updateEmployeeData(
     @Query('companyId') companyId: number,

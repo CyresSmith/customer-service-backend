@@ -9,8 +9,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-// import { CreateScheduleDto } from './dto/create-schedule.dto';
-// import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { SchedulesService } from './schedules.service';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -30,10 +28,10 @@ export class SchedulesController {
   // ============================================ Get Company schedules
 
   @UseGuards(AccessTokenGuard)
-  @Get('get-all/:companyId')
+  @Get('get-all')
   @HttpCode(200)
   async getAllSchedules(
-    @Param('companyId') companyId: number,
+    @Query('companyId') companyId: number,
     @Query('year') year: number,
     @Query('month') month: number
   ): Promise<Schedule[]> {
@@ -43,7 +41,7 @@ export class SchedulesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Patch('update/:employeeId')
+  @Patch(':employeeId/update')
   @HttpCode(200)
   async updateEmployeeSchedule(
     @Query('companyId') companyId: number,
@@ -79,7 +77,7 @@ export class SchedulesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Get('get/:employeeId')
+  @Get(':employeeId/get-one')
   @HttpCode(200)
   async getEmployeeSchedule(
     @Param('employeeId') employeeId: number,
@@ -101,7 +99,7 @@ export class SchedulesController {
 
   @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
   @UseGuards(AccessTokenGuard, RolesGuard)
-  @Delete('delete/:employeeId/:scheduleId')
+  @Delete(':scheduleId/employee/:employeeId/delete')
   @HttpCode(200)
   async deleteEmployeeSchedule(
     @Query('companyId') companyId: number,
