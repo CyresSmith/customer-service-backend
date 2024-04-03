@@ -43,6 +43,7 @@ export class EmployeesRepository extends Repository<Employee> {
         firstName: true,
         lastName: true,
         services: true,
+        birthday: true,
         user: {
           id: true,
           email: true,
