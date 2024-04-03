@@ -40,10 +40,10 @@ export class CompaniesRepository extends Repository<Company> {
   getById(id: number): Promise<Company> {
     return this.findOne({
       relations: [
+        'activities',
         'employees',
         'employees.user',
         // 'employees.category',
-        'activities',
         // 'employees.schedules',
         // 'services',
         // 'services.category',
@@ -55,20 +55,19 @@ export class CompaniesRepository extends Repository<Company> {
       },
       select: {
         activities: { id: true, name: true },
-        // services: {
-        //   id: true,
-        //   name: true,
-        //   avatar: true,
-        //   duration: true,
-        //   price: true,
-        //   type: true,
-        //   category: { id: true, name: true },
-        // },
         employees: {
           id: true,
+          role: true,
+          user: {
+            id: true,
+            // email: true,
+            // phone: true,
+            // firstName: true,
+            // lastName: true,
+            // avatar: true,
+          },
           // jobTitle: true,
           // provider: true,
-          role: true,
           // status: true,
           // avatar: true,
           // info: true,
@@ -87,15 +86,16 @@ export class CompaniesRepository extends Repository<Company> {
           //   id: true,
           //   name: true,
           // },
-          user: {
-            id: true,
-            // email: true,
-            // phone: true,
-            // firstName: true,
-            // lastName: true,
-            // avatar: true,
-          },
         },
+        // services: {
+        //   id: true,
+        //   name: true,
+        //   avatar: true,
+        //   duration: true,
+        //   price: true,
+        //   type: true,
+        //   category: { id: true, name: true },
+        // },
       },
     });
   }
