@@ -30,8 +30,8 @@ export class Client {
   @Column({ nullable: true, default: '' })
   avatar: string;
 
-  @Column({ nullable: true, default: '' })
-  birthday: string;
+  @Column({ nullable: true })
+  birthday: Date;
 
   @Column({ nullable: true, default: '' })
   gender: Gender;

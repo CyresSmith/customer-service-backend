@@ -63,8 +63,8 @@ export class Employee {
   @Column({ nullable: false, default: 'user' })
   role: Role;
 
-  @Column({ nullable: true, default: '' })
-  birthday: string;
+  @Column({ nullable: true })
+  birthday: Date;
 
   @Column({ nullable: true, default: '' })
   gender: Gender;
