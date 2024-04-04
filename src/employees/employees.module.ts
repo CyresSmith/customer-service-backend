@@ -10,19 +10,9 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { EmailService } from 'src/email/email.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Employee]),
-    UsersModule,
-    CloudinaryModule,
-  ],
-  controllers: [EmployeesController],
-  providers: [
-    EmployeesService,
-    EmployeesRepository,
-    UsersRepository,
-    UsersService,
-    EmailService,
-  ],
-  exports: [EmployeesService],
+    imports: [TypeOrmModule.forFeature([Employee]), UsersModule, CloudinaryModule],
+    controllers: [EmployeesController],
+    providers: [EmployeesService, EmployeesRepository, UsersRepository, UsersService, EmailService],
+    exports: [EmployeesService],
 })
 export class EmployeesModule {}

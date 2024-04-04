@@ -7,9 +7,9 @@ import { ClientsService } from './clients.service';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Client]), CloudinaryModule],
-  controllers: [ClientsController],
-  providers: [ClientsRepository, ClientsService],
-  exports: [ClientsService],
+    imports: [TypeOrmModule.forFeature([Client]), CloudinaryModule],
+    controllers: [ClientsController],
+    providers: [ClientsRepository, ClientsService],
+    exports: [ClientsService],
 })
 export class ClientsModule {}

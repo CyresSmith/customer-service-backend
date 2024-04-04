@@ -4,49 +4,49 @@ import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { IBasicUserInfo } from 'src/users/users.types';
 
 export type MessageResponse = {
-  message: string;
+    message: string;
 };
 
 export interface IMessageResponseWithData<T> extends MessageResponse {
-  data: T;
+    data: T;
 }
 
 export interface ICreateUserResponse extends MessageResponse {
-  user: IBasicUserInfo;
+    user: IBasicUserInfo;
 }
 
 export interface ISchedule {
-  from: string;
-  to: string;
+    from: string;
+    to: string;
 }
 
 export interface IWorkSchedule {
-  hours: ISchedule;
-  days: number[];
-  breakHours?: ISchedule;
+    hours: ISchedule;
+    days: number[];
+    breakHours?: ISchedule;
 }
 
 export interface IScheduleDay {
-  hours: ISchedule;
-  breakHours?: ISchedule;
-  day: number;
+    hours: ISchedule;
+    breakHours?: ISchedule;
+    day: number;
 }
 
 export type MonthSchedule = IScheduleDay[];
 
 export interface ICreateSchedule {
-  companyId: number;
-  year: number;
-  month: number;
-  schedule: MonthSchedule;
+    companyId: number;
+    year: number;
+    month: number;
+    schedule: MonthSchedule;
 }
 
 export interface ICreateEmployeeSchedule extends ICreateSchedule {
-  employeeId: number;
+    employeeId: number;
 }
 
 export interface IUpdateEmployeeSchedule extends ICreateEmployeeSchedule {
-  id: number;
+    id: number;
 }
 
 export type IWorkingHours = IWorkSchedule[];
@@ -72,33 +72,30 @@ export type EmployeesCount = '2-5' | '6-9' | '10+';
 export type ServiceType = 'individual' | 'group';
 
 export type EmployeesServiceSettings = {
-  employeeId: number;
-  price?: number;
-  duration?: number;
+    employeeId: number;
+    price?: number;
+    duration?: number;
 };
 
 export type ServiceDataType = {
-  id: number;
-  name: string;
-  avatar: string | null;
-  duration: number;
-  break: number | null;
-  price: number;
-  desc: string | null;
-  employeesSettings: EmployeesServiceSettings[];
-  images: string[];
-  category: IBasicServiceCategoryInfo;
-  employees: IBasicEmployeeInfo[];
-  resources?: Resource[];
-  type: ServiceType;
-  capacity: number;
-  placeLimit: number;
+    id: number;
+    name: string;
+    avatar: string | null;
+    duration: number;
+    break: number | null;
+    price: number;
+    desc: string | null;
+    employeesSettings: EmployeesServiceSettings[];
+    images: string[];
+    category: IBasicServiceCategoryInfo;
+    employees: IBasicEmployeeInfo[];
+    resources?: Resource[];
+    type: ServiceType;
+    capacity: number;
+    placeLimit: number;
 };
 
 export interface IBasicServiceInfo
-  extends Pick<
-    ServiceDataType,
-    'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type'
-  > {
-  category: { id: number; name: string };
+    extends Pick<ServiceDataType, 'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type'> {
+    category: { id: number; name: string };
 }
