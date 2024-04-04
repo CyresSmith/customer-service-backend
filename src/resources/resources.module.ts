@@ -3,7 +3,7 @@ import { ResourcesService } from './resources.service';
 import { ResourcesController } from './resources.controller';
 
 @Module({
-  controllers: [ResourcesController],
-  providers: [ResourcesService],
+    controllers: [ResourcesController],
+    providers: [ResourcesService],
 })
 export class ResourcesModule {}

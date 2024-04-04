@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { Activity } from 'db/entities';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
@@ -18,49 +9,44 @@ import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @Controller('activity')
 export class ActivitiesController {
-  constructor(private readonly activitiesService: ActivitiesService) {}
+    constructor(private readonly activitiesService: ActivitiesService) {}
 
-  // ============================================ Add activity
+    // ============================================ Add activity
 
-  @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-  @UseGuards(AccessTokenGuard, RolesGuard)
-  @Post('company/:companyId')
-  create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
-    return this.activitiesService.create(createActivityDto);
-  }
+    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+    @UseGuards(AccessTokenGuard, RolesGuard)
+    @Post('company/:companyId')
+    create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
+        return this.activitiesService.create(createActivityDto);
+    }
 
-  // ============================================ Find all by category id
+    // ============================================ Find all by category id
 
-  @UseGuards(AccessTokenGuard)
-  @Get('category/:categoryId')
-  findAllByCategoryId(
-    @Param('categoryId') categoryId: number
-  ): Promise<Activity[]> {
-    return this.activitiesService.findAllByCategoryId(categoryId);
-  }
+    @UseGuards(AccessTokenGuard)
+    @Get('category/:categoryId')
+    findAllByCategoryId(@Param('categoryId') categoryId: number): Promise<Activity[]> {
+        return this.activitiesService.findAllByCategoryId(categoryId);
+    }
 
-  // ============================================
+    // ============================================
 
-  @Get()
-  findAll() {
-    return this.activitiesService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.activitiesService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.activitiesService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.activitiesService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateActivityDto: UpdateActivityDto
-  ) {
-    return this.activitiesService.update(+id, updateActivityDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateActivityDto: UpdateActivityDto) {
+        return this.activitiesService.update(+id, updateActivityDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.activitiesService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.activitiesService.remove(+id);
+    }
 }

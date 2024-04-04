@@ -4,19 +4,19 @@ import { Action } from '../../../db/entities/action.entity';
 
 @Injectable()
 export class ActionRepository extends Repository<Action> {
-  constructor(private readonly ds: DataSource) {
-    super(Action, ds.createEntityManager());
-  }
+    constructor(private readonly ds: DataSource) {
+        super(Action, ds.createEntityManager());
+    }
 
-  // ============================================ Get by id
+    // ============================================ Get by id
 
-  async getById(id: number) {
-    const action = await this.findOne({
-      where: {
-        id,
-      },
-    });
+    async getById(id: number) {
+        const action = await this.findOne({
+            where: {
+                id,
+            },
+        });
 
-    return action;
-  }
+        return action;
+    }
 }

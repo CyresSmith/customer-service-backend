@@ -4,13 +4,13 @@ import { EmailService } from './email.service';
 
 @Controller('email')
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+    constructor(private readonly emailService: EmailService) {}
 
-  // ============================================ Send email
+    // ============================================ Send email
 
-  @Post('/')
-  @HttpCode(200)
-  async sendEmail(@Body() body: SendMailDto) {
-    await this.emailService.sendEmail(body);
-  }
+    @Post('/')
+    @HttpCode(200)
+    async sendEmail(@Body() body: SendMailDto) {
+        await this.emailService.sendEmail(body);
+    }
 }

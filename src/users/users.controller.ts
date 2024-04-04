@@ -1,16 +1,16 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Param,
-  Patch,
-  Post,
-  Request,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    Param,
+    Patch,
+    Post,
+    Request,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Company } from 'db/entities';
@@ -30,145 +30,132 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly tokenService: TokenService,
-    private readonly companiesRepository: CompaniesRepository,
-    private readonly cloudinaryService: CloudinaryService
-  ) {}
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly tokenService: TokenService,
+        private readonly companiesRepository: CompaniesRepository,
+        private readonly cloudinaryService: CloudinaryService
+    ) {}
 
-  // ============================================ Register user
+    // ============================================ Register user
 
-  @Post('register')
-  @HttpCode(201)
-  async create(
-    @Body() createUserDto: CreateUserDto
-  ): Promise<ICreateUserResponse> {
-    return await this.usersService.create(createUserDto);
-  }
+    @Post('register')
+    @HttpCode(201)
+    async create(@Body() createUserDto: CreateUserDto): Promise<ICreateUserResponse> {
+        return await this.usersService.create(createUserDto);
+    }
 
-  // ============================================ Verify user
+    // ============================================ Verify user
 
-  @Get('verify/:token')
-  @HttpCode(200)
-  async verifyUser(
-    @Param('token') token: string
-  ): Promise<IBasicUserInfoWithTokens> {
-    const user = await this.usersService.verify(token);
-    const tokenPair = await this.tokenService.generateNewTokenPair(user);
-    await this.usersService.updateTokens(user.id, tokenPair);
-    return { user, ...tokenPair };
-  }
+    @Get('verify/:token')
+    @HttpCode(200)
+    async verifyUser(@Param('token') token: string): Promise<IBasicUserInfoWithTokens> {
+        const user = await this.usersService.verify(token);
+        const tokenPair = await this.tokenService.generateNewTokenPair(user);
+        await this.usersService.updateTokens(user.id, tokenPair);
+        return { user, ...tokenPair };
+    }
 
-  // ============================================ Send verify code
+    // ============================================ Send verify code
 
-  @Post('send-verify-code')
-  @HttpCode(200)
-  async sendVerifyCode(
-    @Body() body: SendVerifyCodeDto
-  ): Promise<MessageResponse> {
-    return await this.usersService.sendVerify(body.email);
-  }
+    @Post('send-verify-code')
+    @HttpCode(200)
+    async sendVerifyCode(@Body() body: SendVerifyCodeDto): Promise<MessageResponse> {
+        return await this.usersService.sendVerify(body.email);
+    }
 
-  // ============================================ Current user
+    // ============================================ Current user
 
-  @UseGuards(AccessTokenGuard)
-  @Get('current')
-  @HttpCode(200)
-  async getUserInfo(
-    @Request() { user }: { user: IBasicUserInfo }
-  ): Promise<{ user: IBasicUserInfo; companies: DeepPartial<Company>[] }> {
-    const userData = await this.usersService.getBaseInfo(user.id);
-    const companies = await this.companiesRepository.find({
-      where: {
-        employees: { user: { id: user.id } },
-      },
-      select: ['name', 'id'],
-    });
+    @UseGuards(AccessTokenGuard)
+    @Get('current')
+    @HttpCode(200)
+    async getUserInfo(
+        @Request() { user }: { user: IBasicUserInfo }
+    ): Promise<{ user: IBasicUserInfo; companies: DeepPartial<Company>[] }> {
+        const userData = await this.usersService.getBaseInfo(user.id);
+        const companies = await this.companiesRepository.find({
+            where: {
+                employees: { user: { id: user.id } },
+            },
+            select: ['name', 'id'],
+        });
 
-    return { user: userData, companies };
-  }
+        return { user: userData, companies };
+    }
 
-  // ============================================ Password restore email
+    // ============================================ Password restore email
 
-  @Post('/password-restore-email')
-  @HttpCode(200)
-  async sendResetLink(
-    @Body() body: SendVerifyCodeDto
-  ): Promise<MessageResponse> {
-    return await this.usersService.sendResetLink(body.email);
-  }
+    @Post('/password-restore-email')
+    @HttpCode(200)
+    async sendResetLink(@Body() body: SendVerifyCodeDto): Promise<MessageResponse> {
+        return await this.usersService.sendResetLink(body.email);
+    }
 
-  // ============================================ Restore password
+    // ============================================ Restore password
 
-  @Post('/restore-password')
-  @HttpCode(200)
-  async restorePassword(
-    @Body() body: RestorePasswordDto
-  ): Promise<MessageResponse> {
-    return await this.usersService.restorePassword(body);
-  }
+    @Post('/restore-password')
+    @HttpCode(200)
+    async restorePassword(@Body() body: RestorePasswordDto): Promise<MessageResponse> {
+        return await this.usersService.restorePassword(body);
+    }
 
-  // ============================================ Update user
+    // ============================================ Update user
 
-  @UseGuards(AccessTokenGuard)
-  @Patch('/update/:id')
-  @HttpCode(200)
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
+    @UseGuards(AccessTokenGuard)
+    @Patch('/update/:id')
+    @HttpCode(200)
+    async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+        return this.usersService.update(+id, updateUserDto);
+    }
 
-  // ============================================ Upload avatar
+    // ============================================ Upload avatar
 
-  @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('avatar'))
-  @Post('/update/:id/avatar')
-  async updateAvatar(
-    @Param('id') id: number,
-    @UploadedFile() avatar: Express.Multer.File
-  ): Promise<{ url: string }> {
-    const { url } = await this.cloudinaryService.uploadFile(
-      {
-        folder: `user_${id}_avatars`,
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        max_bytes: 5 * 1024 * 1024,
-      },
-      avatar
-    );
+    @UseGuards(AccessTokenGuard)
+    @UseInterceptors(FileInterceptor('avatar'))
+    @Post('/update/:id/avatar')
+    async updateAvatar(
+        @Param('id') id: number,
+        @UploadedFile() avatar: Express.Multer.File
+    ): Promise<{ url: string }> {
+        const { url } = await this.cloudinaryService.uploadFile(
+            {
+                folder: `user_${id}_avatars`,
+                allowed_formats: ['jpg', 'jpeg', 'png'],
+                max_bytes: 5 * 1024 * 1024,
+            },
+            avatar
+        );
 
-    await this.usersService.uploadAvatar(id, {
-      avatar: url,
-    });
+        await this.usersService.uploadAvatar(id, {
+            avatar: url,
+        });
 
-    return { url };
-  }
+        return { url };
+    }
 
-  // ============================================ Update password
+    // ============================================ Update password
 
-  @UseGuards(AccessTokenGuard)
-  @Patch('/update-password/:id')
-  @HttpCode(200)
-  async updatePassword(
-    @Param('id') id: string,
-    @Body() updatePassDto: UpdatePasswordDto
-  ) {
-    return this.usersService.updatePassword(+id, updatePassDto);
-  }
+    @UseGuards(AccessTokenGuard)
+    @Patch('/update-password/:id')
+    @HttpCode(200)
+    async updatePassword(@Param('id') id: string, @Body() updatePassDto: UpdatePasswordDto) {
+        return this.usersService.updatePassword(+id, updatePassDto);
+    }
 
-  // ============================================
+    // ============================================
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.usersService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.usersService.findOne(+id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.usersService.remove(+id);
+    }
 }

@@ -10,215 +10,200 @@ import { IBasicEmployee } from './employees.types';
 
 @Injectable()
 export class EmployeesService {
-  constructor(
-    private readonly employeesRepository: EmployeesRepository,
-    private readonly usersRepository: UsersRepository
-  ) {}
+    constructor(
+        private readonly employeesRepository: EmployeesRepository,
+        private readonly usersRepository: UsersRepository
+    ) {}
 
-  // ============================================ Get one
+    // ============================================ Get one
 
-  async getOne(companyId: number, id: number) {
-    return await this.employeesRepository.getById(companyId, id);
-  }
-
-  // ============================================ Get all employees from Company
-
-  async getAllFromCompany(companyId: number): Promise<IBasicEmployee[]> {
-    const employeesData = await this.employeesRepository.find({
-      where: {
-        company: { id: companyId },
-      },
-      relations: ['user', 'services'],
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        jobTitle: true,
-        status: true,
-        avatar: true,
-        services: { id: true },
-        provider: true,
-        user: {
-          firstName: true,
-          lastName: true,
-        },
-      },
-    });
-
-    return employeesData.map(
-      ({ firstName, lastName, user, services, ...rest }) => ({
-        ...rest,
-        firstName: firstName || user.firstName,
-        lastName: lastName || user.lastName,
-        servicesCount: services.length,
-      })
-    );
-  }
-
-  // ============================================ Check is user employee exist
-
-  async checkIsEmployeeExist(email: string, companyId: number) {
-    const employee = await this.employeesRepository.findOne({
-      where: { user: { email }, company: { id: companyId } },
-    });
-
-    if (employee) {
-      throw new BadRequestException(
-        'Співробітник з цією поштою вже зареєстровано!'
-      );
-    }
-  }
-
-  // ============================================ Add exist user employee
-
-  async addExistUserEmployee(
-    userId: number,
-    employeeData: EmployeeDto,
-    companyId: number
-  ): Promise<Employee> {
-    const existEmployee = await this.employeesRepository.findOne({
-      where: { user: { id: userId }, company: { id: companyId } },
-    });
-
-    if (existEmployee) {
-      throw new BadRequestException('Співробітник вже зареєстровано!');
+    async getOne(companyId: number, id: number) {
+        return await this.employeesRepository.getById(companyId, id);
     }
 
-    const user = await this.usersRepository.findOneBy({ id: userId });
+    // ============================================ Get all employees from Company
 
-    if (!user) {
-      throw new BadRequestException('Користувач не знайдено');
+    async getAllFromCompany(companyId: number): Promise<IBasicEmployee[]> {
+        const employeesData = await this.employeesRepository.find({
+            where: {
+                company: { id: companyId },
+            },
+            relations: ['user', 'services'],
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                jobTitle: true,
+                status: true,
+                avatar: true,
+                services: { id: true },
+                provider: true,
+                user: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        });
+
+        return employeesData.map(({ firstName, lastName, user, services, ...rest }) => ({
+            ...rest,
+            firstName: firstName || user.firstName,
+            lastName: lastName || user.lastName,
+            servicesCount: services.length,
+        }));
     }
 
-    const newEmployee = this.employeesRepository.create({
-      ...employeeData,
-      // category: employeeData.category as DeepPartial<Category>,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      user: userId as DeepPartial<User>,
-      company: companyId as DeepPartial<Company>,
-    });
+    // ============================================ Check is user employee exist
 
-    const employee = await this.employeesRepository.save(newEmployee);
+    async checkIsEmployeeExist(email: string, companyId: number) {
+        const employee = await this.employeesRepository.findOne({
+            where: { user: { email }, company: { id: companyId } },
+        });
 
-    return await this.employeesRepository.getById(companyId, employee.id);
-  }
-
-  // ============================================ Add new user employee
-
-  async addNewUserEmployee(
-    userId: number,
-    createEmployeeDto: CreateEmployeeDto,
-    companyId: number
-  ): Promise<Employee> {
-    const { userData, employeeData } = createEmployeeDto;
-
-    const newEmployee = this.employeesRepository.create({
-      ...userData,
-      ...employeeData,
-      // category: employeeData.category as DeepPartial<Category>,
-      user: userId as DeepPartial<User>,
-      company: companyId as DeepPartial<Company>,
-    });
-
-    const employee = await this.employeesRepository.save(newEmployee);
-
-    return await this.employeesRepository.getById(companyId, employee.id);
-  }
-
-  // ============================================ Check employee in Company
-
-  async checkCompanyEmployee(
-    companyId: number,
-    employeeId: number
-  ): Promise<Employee> {
-    const existEmployee = await this.employeesRepository.findOne({
-      where: {
-        id: employeeId,
-        company: { id: companyId },
-      },
-    });
-
-    if (!existEmployee) {
-      throw new BadRequestException('Користувача не існує!');
+        if (employee) {
+            throw new BadRequestException('Співробітник з цією поштою вже зареєстровано!');
+        }
     }
 
-    return existEmployee;
-  }
+    // ============================================ Add exist user employee
 
-  // ======================================== Update employee profile
+    async addExistUserEmployee(
+        userId: number,
+        employeeData: EmployeeDto,
+        companyId: number
+    ): Promise<Employee> {
+        const existEmployee = await this.employeesRepository.findOne({
+            where: { user: { id: userId }, company: { id: companyId } },
+        });
 
-  async updateProfile(id: number, data: UpdateEmployeeProfileDto) {
-    return await this.employeesRepository.update(id, data);
-  }
+        if (existEmployee) {
+            throw new BadRequestException('Співробітник вже зареєстровано!');
+        }
 
-  // ======================================== Remove employee service
+        const user = await this.usersRepository.findOneBy({ id: userId });
 
-  async removeEmployeeService(
-    companyId: number,
-    serviceId: number,
-    employeeId: number
-  ) {
-    const isExist = await this.employeesRepository.findOne({
-      where: {
-        id: employeeId,
-        company: { id: companyId },
-      },
-      relations: ['services'],
-    });
+        if (!user) {
+            throw new BadRequestException('Користувач не знайдено');
+        }
 
-    if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+        const newEmployee = this.employeesRepository.create({
+            ...employeeData,
+            // category: employeeData.category as DeepPartial<Category>,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phone: user.phone,
+            user: userId as DeepPartial<User>,
+            company: companyId as DeepPartial<Company>,
+        });
 
-    isExist.services = isExist.services.filter(({ id }) => +id !== +serviceId);
+        const employee = await this.employeesRepository.save(newEmployee);
 
-    return await this.employeesRepository.save(isExist);
-  }
+        return await this.employeesRepository.getById(companyId, employee.id);
+    }
 
-  // ======================================== Add employee service
+    // ============================================ Add new user employee
 
-  async updateEmployeeServices(
-    companyId: number,
-    services: number[],
-    employeeId: number
-  ) {
-    const isExist = await this.employeesRepository.findOne({
-      where: {
-        id: employeeId,
-        company: { id: companyId },
-      },
-      relations: ['services'],
-    });
+    async addNewUserEmployee(
+        userId: number,
+        createEmployeeDto: CreateEmployeeDto,
+        companyId: number
+    ): Promise<Employee> {
+        const { userData, employeeData } = createEmployeeDto;
 
-    if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+        const newEmployee = this.employeesRepository.create({
+            ...userData,
+            ...employeeData,
+            // category: employeeData.category as DeepPartial<Category>,
+            user: userId as DeepPartial<User>,
+            company: companyId as DeepPartial<Company>,
+        });
 
-    isExist.services = services.map(id => ({
-      id,
-    })) as Service[];
+        const employee = await this.employeesRepository.save(newEmployee);
 
-    return await this.employeesRepository.save(isExist);
-  }
+        return await this.employeesRepository.getById(companyId, employee.id);
+    }
 
-  // ================================================
+    // ============================================ Check employee in Company
 
-  // create(createEmployeeDto: CreateEmployeeDto) {
-  //   return 'This action adds a new employee';
-  // }
+    async checkCompanyEmployee(companyId: number, employeeId: number): Promise<Employee> {
+        const existEmployee = await this.employeesRepository.findOne({
+            where: {
+                id: employeeId,
+                company: { id: companyId },
+            },
+        });
 
-  // findAll() {
-  //   return `This action returns all employees`;
-  // }
+        if (!existEmployee) {
+            throw new BadRequestException('Користувача не існує!');
+        }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} employee`;
-  // }
+        return existEmployee;
+    }
 
-  // update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-  //   return `This action updates a #${id} employee`;
-  // }
+    // ======================================== Update employee profile
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} employee`;
-  // }
+    async updateProfile(id: number, data: UpdateEmployeeProfileDto) {
+        return await this.employeesRepository.update(id, data);
+    }
+
+    // ======================================== Remove employee service
+
+    async removeEmployeeService(companyId: number, serviceId: number, employeeId: number) {
+        const isExist = await this.employeesRepository.findOne({
+            where: {
+                id: employeeId,
+                company: { id: companyId },
+            },
+            relations: ['services'],
+        });
+
+        if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+
+        isExist.services = isExist.services.filter(({ id }) => +id !== +serviceId);
+
+        return await this.employeesRepository.save(isExist);
+    }
+
+    // ======================================== Add employee service
+
+    async updateEmployeeServices(companyId: number, services: number[], employeeId: number) {
+        const isExist = await this.employeesRepository.findOne({
+            where: {
+                id: employeeId,
+                company: { id: companyId },
+            },
+            relations: ['services'],
+        });
+
+        if (!isExist) throw new BadRequestException('Співробітника не знайдено');
+
+        isExist.services = services.map(id => ({
+            id,
+        })) as Service[];
+
+        return await this.employeesRepository.save(isExist);
+    }
+
+    // ================================================
+
+    // create(createEmployeeDto: CreateEmployeeDto) {
+    //   return 'This action adds a new employee';
+    // }
+
+    // findAll() {
+    //   return `This action returns all employees`;
+    // }
+
+    // findOne(id: number) {
+    //   return `This action returns a #${id} employee`;
+    // }
+
+    // update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+    //   return `This action updates a #${id} employee`;
+    // }
+
+    // remove(id: number) {
+    //   return `This action removes a #${id} employee`;
+    // }
 }

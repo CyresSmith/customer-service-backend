@@ -1,174 +1,162 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  CategoriesRepository,
-  CompaniesRepository,
-} from 'src/common/repositories';
+import { CategoriesRepository, CompaniesRepository } from 'src/common/repositories';
 import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
 import { CategoryType, ServiceType } from 'src/common/types';
 import {
-  IBasicCategoryInfo,
-  IBasicServiceCategoryInfo,
-  ICompanyCategoryInfo,
+    IBasicCategoryInfo,
+    IBasicServiceCategoryInfo,
+    ICompanyCategoryInfo,
 } from './categories.types';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
-  constructor(
-    private readonly categoriesRepository: CategoriesRepository,
-    private readonly servicesCategoriesRepository: ServicesCategoriesRepository,
-    private readonly companyRepository: CompaniesRepository
-  ) {}
+    constructor(
+        private readonly categoriesRepository: CategoriesRepository,
+        private readonly servicesCategoriesRepository: ServicesCategoriesRepository,
+        private readonly companyRepository: CompaniesRepository
+    ) {}
 
-  // ============================================ Create company category
+    // ============================================ Create company category
 
-  async create(
-    createCategoryDto: CreateCategoryDto
-  ): Promise<IBasicCategoryInfo> {
-    const { name } = createCategoryDto;
+    async create(createCategoryDto: CreateCategoryDto): Promise<IBasicCategoryInfo> {
+        const { name } = createCategoryDto;
 
-    const isExist = await this.categoriesRepository.checkIsExist(name);
+        const isExist = await this.categoriesRepository.checkIsExist(name);
 
-    if (isExist) {
-      throw new BadRequestException(
-        `Category with name "${name}" is already exist`
-      );
+        if (isExist) {
+            throw new BadRequestException(`Category with name "${name}" is already exist`);
+        }
+
+        const newCategory = this.categoriesRepository.create({
+            ...createCategoryDto,
+        });
+
+        const category = await this.categoriesRepository.save(newCategory);
+
+        return { id: category.id, name: category.name, type: category.type };
     }
 
-    const newCategory = this.categoriesRepository.create({
-      ...createCategoryDto,
-    });
+    // ============================================ Create company category
 
-    const category = await this.categoriesRepository.save(newCategory);
+    async createForCompany(
+        createCategoryDto: CreateCategoryDto,
+        companyId: number
+    ): Promise<IBasicCategoryInfo> {
+        const { name } = createCategoryDto;
 
-    return { id: category.id, name: category.name, type: category.type };
-  }
+        const isExist = await this.categoriesRepository.checkIsExist(name);
 
-  // ============================================ Create company category
+        if (isExist) {
+            throw new BadRequestException(`Category with name "${name}" is already exist`);
+        }
 
-  async createForCompany(
-    createCategoryDto: CreateCategoryDto,
-    companyId: number
-  ): Promise<IBasicCategoryInfo> {
-    const { name } = createCategoryDto;
+        const newCategory = this.categoriesRepository.create({
+            ...createCategoryDto,
+            companies: [{ id: companyId }],
+        });
 
-    const isExist = await this.categoriesRepository.checkIsExist(name);
+        const category = await this.categoriesRepository.save(newCategory);
 
-    if (isExist) {
-      throw new BadRequestException(
-        `Category with name "${name}" is already exist`
-      );
+        return { id: category.id, name: category.name, type: category.type };
     }
 
-    const newCategory = this.categoriesRepository.create({
-      ...createCategoryDto,
-      companies: [{ id: companyId }],
-    });
+    // ============================================ Get all categories by company id
 
-    const category = await this.categoriesRepository.save(newCategory);
+    async findAllByCompanyId(companyId: number): Promise<IBasicCategoryInfo[]> {
+        return await this.categoriesRepository.find({
+            where: {
+                companies: {
+                    id: companyId,
+                },
+            },
+            select: ['id', 'name', 'type'],
+        });
+    }
 
-    return { id: category.id, name: category.name, type: category.type };
-  }
+    // ============================================ Get all categories
 
-  // ============================================ Get all categories by company id
+    async findAll(): Promise<IBasicCategoryInfo[]> {
+        return await this.categoriesRepository.find({
+            select: ['id', 'name', 'type'],
+        });
+    }
 
-  async findAllByCompanyId(companyId: number): Promise<IBasicCategoryInfo[]> {
-    return await this.categoriesRepository.find({
-      where: {
-        companies: {
-          id: companyId,
-        },
-      },
-      select: ['id', 'name', 'type'],
-    });
-  }
+    // ============================================ Get categories by type
 
-  // ============================================ Get all categories
+    async findByType(type: CategoryType): Promise<IBasicCategoryInfo[]> {
+        return await this.categoriesRepository.find({
+            where: {
+                type,
+            },
+            select: ['id', 'name', 'type'],
+            order: { id: 'ASC' },
+        });
+    }
 
-  async findAll(): Promise<IBasicCategoryInfo[]> {
-    return await this.categoriesRepository.find({
-      select: ['id', 'name', 'type'],
-    });
-  }
+    // ============================================ Get Company Activity categories
 
-  // ============================================ Get categories by type
+    async findCompanyCategories(): Promise<ICompanyCategoryInfo[]> {
+        return await this.categoriesRepository.find({
+            where: {
+                type: 'activity',
+            },
+            relations: ['activities'],
+            select: {
+                id: true,
+                name: true,
+                activities: {
+                    id: true,
+                    name: true,
+                },
+            },
+            order: { id: 'ASC' },
+        });
+    }
 
-  async findByType(type: CategoryType): Promise<IBasicCategoryInfo[]> {
-    return await this.categoriesRepository.find({
-      where: {
-        type,
-      },
-      select: ['id', 'name', 'type'],
-      order: { id: 'ASC' },
-    });
-  }
+    // ============================================ Add Company service category
 
-  // ============================================ Get Company Activity categories
+    async addCompanyServiceCategory(data: {
+        company: { id: number };
+        name: string;
+        type: ServiceType;
+    }): Promise<IBasicServiceCategoryInfo> {
+        await this.servicesCategoriesRepository.checkIsExist(data.name);
 
-  async findCompanyCategories(): Promise<ICompanyCategoryInfo[]> {
-    return await this.categoriesRepository.find({
-      where: {
-        type: 'activity',
-      },
-      relations: ['activities'],
-      select: {
-        id: true,
-        name: true,
-        activities: {
-          id: true,
-          name: true,
-        },
-      },
-      order: { id: 'ASC' },
-    });
-  }
+        const newServiceCategory = this.servicesCategoriesRepository.create(data);
 
-  // ============================================ Add Company service category
+        const { id, name, type } = await this.servicesCategoriesRepository.save(newServiceCategory);
 
-  async addCompanyServiceCategory(data: {
-    company: { id: number };
-    name: string;
-    type: ServiceType;
-  }): Promise<IBasicServiceCategoryInfo> {
-    await this.servicesCategoriesRepository.checkIsExist(data.name);
+        return { id, name, type };
+    }
 
-    const newServiceCategory = this.servicesCategoriesRepository.create(data);
+    // ============================================ Get Company services categories
 
-    const { id, name, type } =
-      await this.servicesCategoriesRepository.save(newServiceCategory);
+    async getServicesCategories(id: number): Promise<IBasicServiceCategoryInfo[]> {
+        return await this.servicesCategoriesRepository.find({
+            where: {
+                company: { id },
+            },
+            select: {
+                id: true,
+                name: true,
+                type: true,
+            },
+        });
+    }
 
-    return { id, name, type };
-  }
+    // ============================================
 
-  // ============================================ Get Company services categories
+    findOne(id: number) {
+        return `This action returns a #${id} category`;
+    }
 
-  async getServicesCategories(
-    id: number
-  ): Promise<IBasicServiceCategoryInfo[]> {
-    return await this.servicesCategoriesRepository.find({
-      where: {
-        company: { id },
-      },
-      select: {
-        id: true,
-        name: true,
-        type: true,
-      },
-    });
-  }
+    update(id: number, updateCategoryDto: UpdateCategoryDto) {
+        return `This action updates a #${id} category`;
+    }
 
-  // ============================================
-
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
-  }
-
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} category`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} category`;
+    }
 }

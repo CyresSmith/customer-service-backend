@@ -21,29 +21,29 @@ import { ServicesModule } from './services/services.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync(dbConfig),
-    ConfigModule.forRoot(envConfig),
-    UsersModule,
-    CompaniesModule,
-    ClientsModule,
-    AuthModule,
-    EmailModule,
-    EmployeesModule,
-    CategoriesModule,
-    ServicesModule,
-    ProductsModule,
-    ResourcesModule,
-    ActivitiesModule,
-    SchedulesModule,
-    ActionsModule,
-    CloudinaryModule,
-  ],
-  controllers: [],
-  providers: [CloudinaryService],
+    imports: [
+        TypeOrmModule.forRootAsync(dbConfig),
+        ConfigModule.forRoot(envConfig),
+        UsersModule,
+        CompaniesModule,
+        ClientsModule,
+        AuthModule,
+        EmailModule,
+        EmployeesModule,
+        CategoriesModule,
+        ServicesModule,
+        ProductsModule,
+        ResourcesModule,
+        ActivitiesModule,
+        SchedulesModule,
+        ActionsModule,
+        CloudinaryModule,
+    ],
+    controllers: [],
+    providers: [CloudinaryService],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestLoggingMiddleware).forRoutes('*');
-  }
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(RequestLoggingMiddleware).forRoutes('*');
+    }
 }

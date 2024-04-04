@@ -8,13 +8,8 @@ import { AuthService } from './auth.service';
 import * as Strategies from './strategies';
 
 @Module({
-  imports: [UsersModule, TokenModule, JwtModule.register({})],
-  controllers: [AuthController],
-  providers: [
-    ...Object.values(Strategies),
-    AuthService,
-    UsersRepository,
-    CompaniesRepository,
-  ],
+    imports: [UsersModule, TokenModule, JwtModule.register({})],
+    controllers: [AuthController],
+    providers: [...Object.values(Strategies), AuthService, UsersRepository, CompaniesRepository],
 })
 export class AuthModule {}
