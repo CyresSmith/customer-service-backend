@@ -1,8 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { Activity } from 'db/entities';
-import { Roles } from 'src/common/decorators';
-import { RolesEnum } from 'src/common/enums';
-import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
+import { AccessTokenGuard } from 'src/common/guards';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
@@ -13,8 +11,9 @@ export class ActivitiesController {
 
     // ============================================ Add activity
 
-    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
-    @UseGuards(AccessTokenGuard, RolesGuard)
+    // @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+    // @UseGuards(AccessTokenGuard, RolesGuard)
+    @UseGuards(AccessTokenGuard)
     @Post('')
     create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
         return this.activitiesService.create(createActivityDto);
