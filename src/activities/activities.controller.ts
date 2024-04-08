@@ -15,7 +15,7 @@ export class ActivitiesController {
 
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
     @UseGuards(AccessTokenGuard, RolesGuard)
-    @Post('company/:companyId')
+    @Post('')
     create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
         return this.activitiesService.create(createActivityDto);
     }
