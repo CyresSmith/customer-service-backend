@@ -41,14 +41,16 @@ export class EmployeesService {
                 user: {
                     firstName: true,
                     lastName: true,
+                    avatar: true,
                 },
             },
         });
 
-        return employeesData.map(({ firstName, lastName, user, services, ...rest }) => ({
+        return employeesData.map(({ avatar, firstName, lastName, user, services, ...rest }) => ({
             ...rest,
             firstName: firstName || user.firstName,
             lastName: lastName || user.lastName,
+            avatar: avatar || user.avatar,
             servicesCount: services.length,
         }));
     }
