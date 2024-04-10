@@ -1,18 +1,22 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
 import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { EmailService } from 'src/email/email.service';
 import { ITokenPair } from 'src/token/token.types';
+import { promisify } from 'util';
 import { v4 as uuid } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { IBasicUserInfo, IUserData } from './users.types';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { promisify } from 'util';
-import { compare } from 'bcrypt';
 
 const verificationEmail = (
     verificationCode: string
@@ -294,7 +298,15 @@ export class UsersService {
         return this.usersRepository.getById(id);
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} user`;
+    async remove(id: number): Promise<MessageResponse> {
+        const isExist = await this.usersRepository.findOneBy({ id });
+
+        if (!isExist) {
+            throw new NotFoundException('Користувач не знайден');
+        }
+
+        await this.usersRepository.delete({ id });
+
+        return { message: `До побачення ${isExist.firstName} ${isExist.lastName}` };
     }
 }

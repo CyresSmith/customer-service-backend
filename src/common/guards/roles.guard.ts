@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
@@ -24,6 +24,10 @@ export class RolesGuard implements CanActivate {
                     ? +params?.companyId
                     : +query?.companyId
             );
+
+            if (!employee) {
+                throw new BadRequestException('Щось пішло не так!');
+            }
 
             return this.matchRoles(roles, employee.role);
         }

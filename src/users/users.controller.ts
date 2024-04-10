@@ -23,10 +23,10 @@ import { DeepPartial } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
-import { IBasicUserInfo, IBasicUserInfoWithTokens } from './users.types';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { IBasicUserInfo, IBasicUserInfoWithTokensAndCompanies } from './users.types';
 
 @Controller('users')
 export class UsersController {
@@ -49,11 +49,19 @@ export class UsersController {
 
     @Get('verify/:token')
     @HttpCode(200)
-    async verifyUser(@Param('token') token: string): Promise<IBasicUserInfoWithTokens> {
+    async verifyUser(@Param('token') token: string): Promise<IBasicUserInfoWithTokensAndCompanies> {
         const user = await this.usersService.verify(token);
         const tokenPair = await this.tokenService.generateNewTokenPair(user);
         await this.usersService.updateTokens(user.id, tokenPair);
-        return { user, ...tokenPair };
+
+        const companies = await this.companiesRepository.find({
+            where: {
+                employees: { user: { id: user.id } },
+            },
+            select: ['name', 'id'],
+        });
+
+        return { user, companies, ...tokenPair };
     }
 
     // ============================================ Send verify code
@@ -154,8 +162,9 @@ export class UsersController {
         return this.usersService.findOne(+id);
     }
 
+    @UseGuards(AccessTokenGuard)
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.usersService.remove(+id);
+    async remove(@Param('id') id: number): Promise<MessageResponse> {
+        return this.usersService.remove(id);
     }
 }

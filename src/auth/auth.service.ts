@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UsersRepository } from 'src/common/repositories';
 import { IBasicUserInfo } from 'src/users/users.types';
@@ -20,11 +25,11 @@ export class AuthService {
         });
 
         if (!user || !user.password) {
-            throw new ForbiddenException('User not found');
+            throw new NotFoundException('Користувач не знайден');
         }
 
         if (!user.verify) {
-            throw new ForbiddenException('Please confirm Your registration');
+            throw new BadRequestException('Будь ласка підтвердіть реєстрацію на пошті!');
         }
 
         if (!(await promisify(compare)(password, user.password))) {

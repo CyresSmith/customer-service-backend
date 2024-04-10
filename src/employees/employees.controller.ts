@@ -224,8 +224,13 @@ export class EmployeesController {
     //   return this.employeesService.update(+id, updateEmployeeDto);
     // }
 
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //   return this.employeesService.remove(+id);
-    // }
+    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+    @UseGuards(AccessTokenGuard, RolesGuard)
+    @Delete(':id')
+    remove(
+        @Query('companyId') companyId: number,
+        @Param('id') id: number
+    ): Promise<MessageResponse> {
+        return this.employeesService.remove(id, companyId);
+    }
 }

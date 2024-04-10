@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Company } from 'db/entities';
 import { DataSource, Repository } from 'typeorm';
 
@@ -34,19 +34,9 @@ export class CompaniesRepository extends Repository<Company> {
 
     // ============================================ Get by id
 
-    getById(id: number): Promise<Company> {
-        return this.findOne({
-            relations: [
-                'activities',
-                'employees',
-                'employees.user',
-                // 'employees.category',
-                // 'employees.schedules',
-                // 'services',
-                // 'services.category',
-                // 'employees.services',
-                // 'employees.services.category',
-            ],
+    async getById(id: number): Promise<Company> {
+        const company = await this.findOne({
+            relations: ['activities', 'employees', 'employees.user'],
             where: {
                 id,
             },
@@ -57,44 +47,16 @@ export class CompaniesRepository extends Repository<Company> {
                     role: true,
                     user: {
                         id: true,
-                        // email: true,
-                        // phone: true,
-                        // firstName: true,
-                        // lastName: true,
-                        // avatar: true,
                     },
-                    // jobTitle: true,
-                    // provider: true,
-                    // status: true,
-                    // avatar: true,
-                    // info: true,
-                    // email: true,
-                    // phone: true,
-                    // firstName: true,
-                    // lastName: true,
-                    // birthday: true,
-                    // gender: true,
-                    // schedules: {
-                    //   year: true,
-                    //   month: true,
-                    //   schedule: true,
-                    // },
-                    // category: {
-                    //   id: true,
-                    //   name: true,
-                    // },
                 },
-                // services: {
-                //   id: true,
-                //   name: true,
-                //   avatar: true,
-                //   duration: true,
-                //   price: true,
-                //   type: true,
-                //   category: { id: true, name: true },
-                // },
             },
         });
+
+        if (!company) {
+            throw new NotFoundException('Компанію не знайдено!');
+        }
+
+        return company;
     }
 
     // ============================================ Get Profile

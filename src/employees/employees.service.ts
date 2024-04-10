@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Company, Employee, Service, User } from 'db/entities';
+import { RolesEnum } from 'src/common/enums';
 import { EmployeesRepository, UsersRepository } from 'src/common/repositories';
+import { MessageResponse } from 'src/common/types';
 import { DeepPartial } from 'typeorm';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeeDto } from './dto/employee.dto';
@@ -205,7 +207,19 @@ export class EmployeesService {
     //   return `This action updates a #${id} employee`;
     // }
 
-    // remove(id: number) {
-    //   return `This action removes a #${id} employee`;
-    // }
+    async remove(id: number, companyId: number): Promise<MessageResponse> {
+        const isExist = await this.employeesRepository.findOne({
+            where: { id, company: { id: companyId } },
+        });
+
+        if (!isExist) throw new NotFoundException('Співробітник не знайдено');
+
+        if (!isExist.role || isExist.role === RolesEnum.OWNER) {
+            throw new BadRequestException('Капітан залишає корабель останнім!');
+        }
+
+        await this.employeesRepository.delete({ id });
+
+        return { message: `Співробітник ${isExist.firstName} ${isExist.lastName} видалено` };
+    }
 }
