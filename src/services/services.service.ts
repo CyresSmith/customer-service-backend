@@ -5,7 +5,7 @@ import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCa
 import { IBasicServiceInfo, ServiceDataType } from 'src/common/types';
 import { DeepPartial } from 'typeorm';
 import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
+// import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServicesService {
@@ -62,7 +62,8 @@ export class ServicesService {
             duration: service.duration,
             price: service.price,
             type: service.type,
-            category: { id: category.id, name: category.name },
+            category: { id: category.id, name: category.name, type: category.type },
+            employeesSettings: service.employeesSettings,
         };
     }
 
@@ -79,6 +80,7 @@ export class ServicesService {
                 duration: true,
                 price: true,
                 type: true,
+                employeesSettings: true,
                 category: { id: true, name: true },
             },
         });
@@ -139,15 +141,15 @@ export class ServicesService {
 
     // ============================================
 
-    findAll() {
-        return `This action returns all services`;
-    }
+    // findAll() {
+    //     return `This action returns all services`;
+    // }
 
-    findOne(id: number) {
-        return `This action returns a #${id} service`;
-    }
+    // findOne(id: number) {
+    //     return `This action returns a #${id} service`;
+    // }
 
-    update(id: number, updateServiceDto: UpdateServiceDto) {
-        return `This action updates a #${id} service`;
-    }
+    // update(id: number, updateServiceDto: UpdateServiceDto) {
+    //     return `This action updates a #${id} service`;
+    // }
 }

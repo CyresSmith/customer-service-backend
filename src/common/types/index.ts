@@ -95,7 +95,7 @@ export type ServiceDataType = {
     placeLimit: number;
 };
 
-export interface IBasicServiceInfo
-    extends Pick<ServiceDataType, 'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type'> {
-    category: { id: number; name: string };
-}
+export type IBasicServiceInfo = Pick<
+    ServiceDataType,
+    'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type' | 'category' | 'employeesSettings'
+>;

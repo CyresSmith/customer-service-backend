@@ -40,7 +40,19 @@ export class EmployeesRepository extends Repository<Employee> {
                 phone: true,
                 firstName: true,
                 lastName: true,
-                services: true,
+                services: {
+                    id: true,
+                    avatar: true,
+                    name: true,
+                    duration: true,
+                    price: true,
+                    type: true,
+                    category: {
+                        id: true,
+                        name: true,
+                    },
+                    employeesSettings: true,
+                },
                 birthday: true,
                 user: {
                     id: true,
