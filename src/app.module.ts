@@ -18,6 +18,7 @@ import { ProductsModule } from './products/products.module';
 import { ResourcesModule } from './resources/resources.module';
 import { SchedulesModule } from './schedules/schedules.module';
 import { ServicesModule } from './services/services.module';
+import { SocketService } from './socket/socket.service';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -40,7 +41,8 @@ import { UsersModule } from './users/users.module';
         CloudinaryModule,
     ],
     controllers: [],
-    providers: [CloudinaryService],
+
+    providers: [CloudinaryService, SocketService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
