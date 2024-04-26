@@ -147,6 +147,15 @@ export class SchedulesService {
 
     // ============================================
 
+    async getEmployeeAllSchedules(companyId: number, employeeId: number): Promise<Schedule[]> {
+        return await this.schedulesRepository.find({
+            where: {
+                company: { id: companyId },
+                employee: { id: employeeId },
+            },
+        });
+    }
+
     // create(createScheduleDto: CreateScheduleDto) {
     //   return 'This action adds a new schedule';
     // }
