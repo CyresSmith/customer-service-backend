@@ -1,9 +1,11 @@
 export { Action } from './action.entity';
 export { Activity } from './activity.entity';
 export { Category } from './category.entity';
+export { Channel } from './channel.entity';
 export { Client } from './client.entity';
 export { Company } from './company.entity';
 export { Employee } from './employee.entity';
+export { Message } from './message.entity';
 export { Product } from './product.entity';
 export { Resource } from './resource.entity';
 export { Schedule } from './schedule.entity';

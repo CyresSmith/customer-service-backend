@@ -44,6 +44,8 @@ export class EmployeesService {
                     firstName: true,
                     lastName: true,
                     avatar: true,
+                    id: true,
+                    isOnline: true,
                 },
             },
         });
@@ -54,6 +56,8 @@ export class EmployeesService {
             lastName: lastName || user.lastName,
             avatar: avatar || user.avatar,
             servicesCount: services.length,
+            userId: user.id,
+            isOnline: user.isOnline,
         }));
     }
 

@@ -1,4 +1,4 @@
-import { Resource } from 'db/entities';
+import { Channel, Resource } from 'db/entities';
 import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { IBasicUserInfo } from 'src/users/users.types';
@@ -99,3 +99,7 @@ export type IBasicServiceInfo = Pick<
     ServiceDataType,
     'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type' | 'category' | 'employeesSettings'
 >;
+
+export type ChannelData = Omit<Channel, 'users'> & {
+    users: number[];
+};

@@ -53,7 +53,7 @@ export class EmployeesController {
     // ============================================ Get all employees from Company
 
     @UseGuards(AccessTokenGuard)
-    @Get('get-all-from-company')
+    @Get('get-all-company-employees')
     @HttpCode(200)
     async getAllFromCompany(@Query('companyId') companyId: number): Promise<IBasicEmployee[]> {
         return this.employeesService.getAllFromCompany(companyId);

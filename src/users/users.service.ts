@@ -219,7 +219,7 @@ export class UsersService {
     // ============================================ Update user tokens
 
     async updateTokens(userId: number, tokens: ITokenPair) {
-        await this.usersRepository.update(userId, tokens);
+        await this.usersRepository.update(userId, { ...tokens, isOnline: true });
     }
 
     // ============================================ Get base user info
@@ -240,6 +240,7 @@ export class UsersService {
         await this.usersRepository.update(id, {
             accessToken: '',
             refreshToken: '',
+            isOnline: false,
         });
 
         return { message: 'Successfully logout' };

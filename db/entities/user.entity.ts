@@ -2,11 +2,14 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { Channel } from './channel.entity';
 import { Employee } from './employee.entity';
+import { Message } from './message.entity';
 
 @Entity({ name: 'User' })
 export class User {
@@ -31,6 +34,12 @@ export class User {
     @OneToMany(() => Employee, employee => employee.user)
     employees: Employee[];
 
+    @ManyToMany(() => Channel, channel => channel.users)
+    channels: Channel[];
+
+    @OneToMany(() => Message, message => message.from)
+    messages: Message[];
+
     @Column({ nullable: false })
     password: string;
 
@@ -39,6 +48,9 @@ export class User {
 
     @Column({ nullable: true })
     refreshToken: string;
+
+    @Column({ default: false })
+    isOnline: boolean;
 
     @Column({ default: false })
     verify: boolean;

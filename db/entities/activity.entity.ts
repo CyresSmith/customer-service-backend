@@ -1,36 +1,36 @@
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { Company } from './company.entity';
 
 @Entity({ name: 'Activity' })
 export class Activity {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column({ nullable: false })
-  name: string;
+    @Column({ nullable: false })
+    name: string;
 
-  @ManyToMany(() => Company, company => company.id)
-  companies: Company[];
+    @ManyToMany(() => Company, company => company.id)
+    companies: Company[];
 
-  @ManyToOne(() => Category, category => category.activities)
-  @JoinColumn({ name: 'categoryId' })
-  @Index()
-  category: Category;
+    @ManyToOne(() => Category, category => category.activities)
+    @JoinColumn({ name: 'categoryId' })
+    @Index()
+    category: Category;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
 }
