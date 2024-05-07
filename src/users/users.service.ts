@@ -96,7 +96,7 @@ export class UsersService {
         await this.emailService.sendEmail({
             to: createUserDto.email,
             subject: 'Verify email',
-            html: `<a href=${this.configService.get<string>('FRONTEND_URL')}verify/${verificationCode}>Натисніть для підтвердження реєстрації</a>`,
+            html: `<a href=${this.configService.get<string>('FRONTEND_URL')}/verify/${verificationCode}>Натисніть для підтвердження реєстрації</a>`,
         });
 
         const user = await this.usersRepository.save(newUser);

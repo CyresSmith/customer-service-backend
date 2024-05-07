@@ -178,6 +178,7 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
 
         client.broadcast.emit('user:bye', {
             name: user.firstName + ' ' + user.lastName,
+            id: client.user.id,
         });
 
         console.log(`socket ${client.id} disconnected`);
