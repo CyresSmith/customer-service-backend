@@ -19,6 +19,7 @@ import { ResourcesModule } from './resources/resources.module';
 import { SchedulesModule } from './schedules/schedules.module';
 import { ServicesModule } from './services/services.module';
 import { UsersModule } from './users/users.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
     imports: [
@@ -38,6 +39,7 @@ import { UsersModule } from './users/users.module';
         SchedulesModule,
         ActionsModule,
         CloudinaryModule,
+        EventsModule,
     ],
     controllers: [],
     providers: [CloudinaryService],

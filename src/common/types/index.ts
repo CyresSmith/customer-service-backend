@@ -99,3 +99,16 @@ export type IBasicServiceInfo = Pick<
     ServiceDataType,
     'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type' | 'category' | 'employeesSettings'
 >;
+
+export type EventDataType = {
+    id: number;
+    year: number;
+    month: number;
+    day: number;
+    time: string;
+    duration: number;
+    comments: string | null;
+    employee: { id: number };
+    client: { id: number };
+    services: { id: number }[];
+};

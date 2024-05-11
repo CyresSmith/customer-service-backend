@@ -17,6 +17,7 @@ import { Company } from './company.entity';
 import { Schedule } from './schedule.entity';
 import { Service } from './service.entity';
 import { User } from './user.entity';
+import { Event } from './event.entity';
 
 @Entity({ name: 'Employee' })
 export class Employee {
@@ -96,6 +97,13 @@ export class Employee {
         },
     })
     services: Service[];
+
+    @ManyToMany(() => Event, event => event.employee, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    events: Event[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

@@ -8,7 +8,6 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeeDto } from './dto/employee.dto';
 import { UpdateEmployeeProfileDto } from './dto/update-employee-profile.dto';
 import { IBasicEmployee } from './employees.types';
-// import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeesService {

@@ -1,90 +1,98 @@
 import { EmployeesServiceSettings, ServiceType } from 'src/common/types';
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Resource } from './resource.entity';
 import { ServiceCategory } from './serviceCategory.entity';
+import { Event } from './event.entity';
 
 @Entity({ name: 'Service' })
 export class Service {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column({ nullable: false })
-  name: string;
+    @Column({ nullable: false })
+    name: string;
 
-  @ManyToOne(() => Company, company => company.id, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'companyId' })
-  @Index()
-  company: Company;
+    @ManyToOne(() => Company, company => company.id, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    @JoinColumn({ name: 'companyId' })
+    @Index()
+    company: Company;
 
-  @Column({ nullable: false, default: '' })
-  avatar: string;
+    @Column({ nullable: false, default: '' })
+    avatar: string;
 
-  @Column({ nullable: false })
-  duration: number;
+    @Column({ nullable: false })
+    duration: number;
 
-  @Column({ nullable: true })
-  break: number;
+    @Column({ nullable: true })
+    break: number;
 
-  @Column({ nullable: false, default: 0 })
-  price: number;
+    @Column({ nullable: false, default: 0 })
+    price: number;
 
-  @Column({ nullable: false, default: '' })
-  desc: string;
+    @Column({ nullable: false, default: '' })
+    desc: string;
 
-  @Column({ type: 'jsonb', nullable: true, default: [] })
-  employeesSettings: EmployeesServiceSettings[];
+    @Column({ type: 'jsonb', nullable: true, default: [] })
+    employeesSettings: EmployeesServiceSettings[];
 
-  @Column({ type: 'jsonb', nullable: true, default: [] })
-  images: string[];
+    @Column({ type: 'jsonb', nullable: true, default: [] })
+    images: string[];
 
-  @ManyToOne(() => ServiceCategory, category => category.services, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'categoryId' })
-  @Index()
-  category: ServiceCategory;
+    @ManyToOne(() => ServiceCategory, category => category.services, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    @JoinColumn({ name: 'categoryId' })
+    @Index()
+    category: ServiceCategory;
 
-  @ManyToMany(() => Employee, employee => employee.services, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    nullable: true,
-  })
-  employees: Employee[];
+    @ManyToMany(() => Employee, employee => employee.services, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    employees: Employee[];
 
-  @ManyToMany(() => Resource, resource => resource.services, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  resources: Resource[];
+    @ManyToMany(() => Event, event => event.services, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    events: Event[];
 
-  @Column({ nullable: false, default: 'individual' })
-  type: ServiceType;
+    @ManyToMany(() => Resource, resource => resource.services, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    resources: Resource[];
 
-  @Column({ nullable: false, default: 1 })
-  capacity: number;
+    @Column({ nullable: false, default: 'individual' })
+    type: ServiceType;
 
-  @Column({ nullable: true })
-  placeLimit: number;
+    @Column({ nullable: false, default: 1 })
+    capacity: number;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+    @Column({ nullable: true })
+    placeLimit: number;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
 }
