@@ -23,7 +23,7 @@ import { UsersService } from 'src/users/users.service';
 @WebSocketGateway({
     cors: {
         origin: [process.env.FRONTEND_URL],
-        allowedHeaders: ['authorization'],
+        allowedHeaders: ['Authorization'],
         credentials: true,
     },
     connectionStateRecovery: {
