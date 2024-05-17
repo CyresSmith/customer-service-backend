@@ -64,8 +64,14 @@ export class ChannelsService {
                     where: {
                         channel: { id },
                     },
-                    relations: ['from'],
-                    select: { content: true, createdAt: true, id: true, from: { id: true } },
+                    relations: ['from', 'channel'],
+                    select: {
+                        content: true,
+                        createdAt: true,
+                        id: true,
+                        from: { id: true },
+                        channel: { id: true },
+                    },
                     order: {
                         createdAt: 'DESC',
                     },

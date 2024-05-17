@@ -150,6 +150,8 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         const { user } = socket;
         const message = await this.messagesService.create({ ...data, from: user.id });
 
+        delete message.updatedAt;
+
         socket.to(channelRoom(message.channel.id)).emit('message:sent', message);
 
         return message;
