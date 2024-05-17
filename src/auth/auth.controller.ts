@@ -31,7 +31,7 @@ export class AuthController {
             where: {
                 employees: { user: { id: user.id } },
             },
-            select: ['name', 'id'],
+            select: ['name', 'id', 'avatar'],
         });
 
         return { user, companies, ...tokenPair };

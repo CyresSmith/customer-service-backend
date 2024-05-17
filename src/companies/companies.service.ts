@@ -60,7 +60,7 @@ export class CompaniesService {
 
         await this.employeesRepository.save(newEmployee);
 
-        return { id: company.id, name: company.name };
+        return { id: company.id, name: company.name, avatar: company.avatar };
     }
 
     // ============================================== Find one Company

@@ -19,7 +19,6 @@ import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { CompaniesRepository } from 'src/common/repositories';
 import { ICreateUserResponse, MessageResponse } from 'src/common/types';
 import { TokenService } from 'src/token/token.service';
-import { DeepPartial } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RestorePasswordDto } from './dto/restore-password.dto';
 import { SendVerifyCodeDto } from './dto/send-verify-code.dto';
@@ -79,13 +78,13 @@ export class UsersController {
     @HttpCode(200)
     async getUserInfo(
         @Request() { user }: { user: IBasicUserInfo }
-    ): Promise<{ user: IBasicUserInfo; companies: DeepPartial<Company>[] }> {
+    ): Promise<{ user: IBasicUserInfo; companies: Pick<Company, 'id' | 'name' | 'avatar'>[] }> {
         const userData = await this.usersService.getBaseInfo(user.id);
         const companies = await this.companiesRepository.find({
             where: {
                 employees: { user: { id: user.id } },
             },
-            select: ['name', 'id'],
+            select: ['name', 'id', 'avatar'],
         });
 
         return { user: userData, companies };

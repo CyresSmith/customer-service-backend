@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MessagesRepository } from 'src/common/repositories';
+import { LessThan } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
@@ -17,6 +18,23 @@ export class MessagesService {
         });
 
         return await this.messagesRepository.save(newMessage);
+    }
+
+    async getChannelMessages(data: { id: number; fromDate: string; take: number }) {
+        const { id, fromDate, take } = data;
+
+        return await this.messagesRepository.find({
+            where: {
+                channel: { id },
+                createdAt: LessThan(new Date(fromDate)),
+            },
+            relations: ['from'],
+            select: { content: true, createdAt: true, id: true, from: { id: true } },
+            order: {
+                createdAt: 'DESC',
+            },
+            take,
+        });
     }
 
     findAll() {

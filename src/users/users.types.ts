@@ -11,5 +11,5 @@ export interface IBasicUserInfoWithTokens extends ITokenPair {
 }
 
 export interface IBasicUserInfoWithTokensAndCompanies extends IBasicUserInfoWithTokens {
-    companies: Company[];
+    companies: Pick<Company, 'id' | 'name' | 'avatar'>[];
 }

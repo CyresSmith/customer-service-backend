@@ -1,16 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Channel, User } from 'db/entities';
-import { ChannelsRepository } from 'src/common/repositories';
+import { take } from 'src/common/constants';
+import { ChannelsRepository, MessagesRepository } from 'src/common/repositories';
+import { MessageResponse } from 'src/common/types';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 
-import { ChannelData, MessageResponse } from 'src/common/types';
-
 @Injectable()
 export class ChannelsService {
-    constructor(private readonly channelsRepository: ChannelsRepository) {}
+    constructor(
+        private readonly channelsRepository: ChannelsRepository,
+        private readonly messagesRepository: MessagesRepository
+    ) {}
 
-    async create(createChannelDto: CreateChannelDto): Promise<Channel> {
+    async create(createChannelDto: CreateChannelDto): Promise<
+        Omit<Channel, 'users'> & {
+            users: number[];
+        }
+    > {
         const { name, users, company: id } = createChannelDto;
 
         if (name) {
@@ -23,7 +30,9 @@ export class ChannelsService {
             company: { id },
         });
 
-        return await this.channelsRepository.save(newChannel);
+        const channel = await this.channelsRepository.save(newChannel);
+
+        return { ...channel, users: channel.users.map(({ id }) => id) };
     }
 
     findAll() {
@@ -38,8 +47,42 @@ export class ChannelsService {
         return `This action updates a #${id} channel`;
     }
 
-    async getUserChannels(userId: number): Promise<ChannelData[]> {
-        return await this.channelsRepository.getUserChannels(userId);
+    async getUserChannels(userId: number) {
+        const channels = await this.channelsRepository.getUserChannels(userId);
+
+        if (channels.length > 0) {
+            const promises = channels.map(async ({ id }) => {
+                const channel = await this.channelsRepository.findOne({
+                    where: { id },
+                    relations: ['users'],
+                    select: {
+                        users: { id: true },
+                    },
+                });
+
+                const messages = await this.messagesRepository.find({
+                    where: {
+                        channel: { id },
+                    },
+                    relations: ['from'],
+                    select: { content: true, createdAt: true, id: true, from: { id: true } },
+                    order: {
+                        createdAt: 'DESC',
+                    },
+                    take,
+                });
+
+                return {
+                    ...channel,
+                    users: channel.users.map(({ id }) => id),
+                    messages,
+                };
+            });
+
+            return await Promise.all(promises);
+        }
+
+        return [];
     }
 
     async addUsers(id: number, companyId: number, users: number[]): Promise<MessageResponse> {

@@ -50,7 +50,6 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         server.use(WSAuthMiddleware(this.jwtService, this.usersService, this.configService));
     }
 
-    // @UseGuards(wsJwtGuard)
     @SubscribeMessage('user:online')
     async userOnline(@ConnectedSocket() socket: AuthSocket) {
         const { user } = socket;
@@ -63,7 +62,6 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         });
     }
 
-    // @UseGuards(wsJwtGuard)
     // @SubscribeMessage('user:offline')
     // async userBye(@ConnectedSocket() socket: AuthSocket) {
     //     const { user } = socket;
@@ -76,18 +74,18 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     //     });
     // }
 
-    // @UseGuards(wsJwtGuard)
     @SubscribeMessage('channel:list')
     async listChannels(@ConnectedSocket() socket: AuthSocket) {
         const { user } = socket;
 
         const channels = await this.channelsService.getUserChannels(user.id);
+
         const onlineUsers = await this.usersRepository.find({
             where: { isOnline: true },
             select: ['id'],
         });
 
-        // const channel = await this.channelsService.fin(data);
+        // const channel = await this.channelsService.find(data);
 
         // socket.to(userRoom(user.id)).emit('channel:created', channel);
 
@@ -96,7 +94,6 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         return { channels, onlineUsers: onlineUsers.map(({ id }) => id) };
     }
 
-    // @UseGuards(wsJwtGuard)
     @SubscribeMessage('channel:create')
     async createChannel(
         @MessageBody() data: CreateChannelDto,
@@ -112,7 +109,7 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
 
         const newChannel = { ...channel, messages: [] };
 
-        channel.users.forEach(({ id }) => {
+        channel.users.forEach(id => {
             this.server.in(userRoom(id)).socketsJoin(`channel:${channel.id}`);
 
             if (id !== user.id) {
@@ -123,7 +120,28 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         return newChannel;
     }
 
-    // @UseGuards(wsJwtGuard)
+    @SubscribeMessage('channel:messages')
+    async getChannelMessages(@MessageBody() data: { id: number; fromDate: string; take: number }) {
+        return await this.messagesService.getChannelMessages(data);
+    }
+
+    @SubscribeMessage('message:typing')
+    async onMessageTyping(@MessageBody() channelId: number, @ConnectedSocket() socket: AuthSocket) {
+        const { user } = socket;
+
+        socket.broadcast.to(channelRoom(channelId)).emit('user:startTyping', user.id);
+    }
+
+    @SubscribeMessage('message:stopTyping')
+    async onMessageStopTyping(
+        @MessageBody() channelId: number,
+        @ConnectedSocket() socket: AuthSocket
+    ) {
+        const { user } = socket;
+
+        socket.broadcast.to(channelRoom(channelId)).emit('user:stopTyping', user.id);
+    }
+
     @SubscribeMessage('message:send')
     async addMessage(
         @MessageBody() data: { content: string; channelId: number },
