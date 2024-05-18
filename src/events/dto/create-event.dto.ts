@@ -1,4 +1,5 @@
 import { IsArray, IsDefined, IsNumber, IsOptional, IsString } from 'class-validator';
+import { EventTime } from 'src/common/types';
 
 export class CreateEventDto {
     @IsNumber()
@@ -17,9 +18,16 @@ export class CreateEventDto {
     @IsDefined()
     day: number;
 
-    @IsString()
+    // @IsString()
+    // @IsDefined()
+    // from: string;
+
+    // @IsString()
+    // @IsDefined()
+    // to: string;
+
     @IsDefined()
-    time: string;
+    time: EventTime;
 
     @IsOptional()
     @IsString()

@@ -100,12 +100,17 @@ export type IBasicServiceInfo = Pick<
     'id' | 'name' | 'avatar' | 'duration' | 'price' | 'type' | 'category' | 'employeesSettings'
 >;
 
+export type EventTime = {
+    from: string;
+    to: string;
+};
+
 export type EventDataType = {
     id: number;
     year: number;
     month: number;
     day: number;
-    time: string;
+    time: EventTime;
     duration: number;
     comments: string | null;
     employee: { id: number };

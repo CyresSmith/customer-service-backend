@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FixEventEntity1715328133156 implements MigrationInterface {
-    name = 'FixEventEntity1715328133156'
+export class FixEventEntity1716024891939 implements MigrationInterface {
+    name = 'FixEventEntity1716024891939'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "event_services" ("services" integer NOT NULL, "events" integer NOT NULL, CONSTRAINT "PK_686dec243386ad4a084f70bfe32" PRIMARY KEY ("services", "events"))`);
@@ -11,7 +11,7 @@ export class FixEventEntity1715328133156 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "Event" ADD "year" integer NOT NULL`);
         await queryRunner.query(`ALTER TABLE "Event" ADD "month" integer NOT NULL`);
         await queryRunner.query(`ALTER TABLE "Event" ADD "day" integer NOT NULL`);
-        await queryRunner.query(`ALTER TABLE "Event" ADD "time" character varying NOT NULL`);
+        await queryRunner.query(`ALTER TABLE "Event" ADD "time" jsonb NOT NULL`);
         await queryRunner.query(`ALTER TABLE "event_services" ADD CONSTRAINT "FK_6ea5df86767113ded531ea05e4d" FOREIGN KEY ("services") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "event_services" ADD CONSTRAINT "FK_58f2c989d2ce8a05016f973171b" FOREIGN KEY ("events") REFERENCES "Service"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
     }
