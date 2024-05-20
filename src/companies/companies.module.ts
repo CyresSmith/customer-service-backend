@@ -11,15 +11,16 @@ import {
     ServicesRepository,
     UsersRepository,
 } from 'src/common/repositories';
+import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
 import { EmployeesModule } from 'src/employees/employees.module';
 import { EmployeesService } from 'src/employees/employees.service';
 import { SchedulesModule } from 'src/schedules/schedules.module';
 import { SchedulesService } from 'src/schedules/schedules.service';
 import { ServicesService } from 'src/services/services.service';
+import { SocketModule } from 'src/socket/socket.module';
 import { UsersModule } from 'src/users/users.module';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
-import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCategories.repository';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { ServicesCategoriesRepository } from 'src/common/repositories/servicesCa
         CloudinaryModule,
         EmployeesModule,
         SchedulesModule,
+        SocketModule,
     ],
     controllers: [CompaniesController],
     providers: [

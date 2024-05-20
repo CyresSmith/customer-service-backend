@@ -112,9 +112,10 @@ export class CompaniesController {
     @HttpCode(200)
     async updateProfile(
         @Param('companyId') companyId: number,
-        @Body() data: UpdateCompanyProfileDto
+        @Body() data: UpdateCompanyProfileDto,
+        @Request() { user }: { user: IBasicUserInfo }
     ): Promise<MessageResponse> {
-        await this.companiesService.updateProfile(companyId, data);
+        await this.companiesService.updateProfile(companyId, data, user.id);
 
         return { message: 'Successfully updated' };
     }

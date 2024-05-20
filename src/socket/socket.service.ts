@@ -50,6 +50,16 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
         server.use(WSAuthMiddleware(this.jwtService, this.usersService, this.configService));
     }
 
+    async broadcastEvent(fromUserId: number, event: string, data: unknown) {
+        const sockets = (await this.server.fetchSockets()) as unknown as AuthSocket[];
+
+        const userSocket = sockets.find(({ user }) => user.id === fromUserId);
+
+        if (userSocket) {
+            userSocket.broadcast.emit(event, data);
+        }
+    }
+
     @SubscribeMessage('user:online')
     async userOnline(@ConnectedSocket() socket: AuthSocket) {
         const { user } = socket;
@@ -205,6 +215,8 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleConnection(socket: Socket) {
+        console.log(`socket ${socket.id} connected`);
+
         this.initEventHandlers(socket);
     }
 

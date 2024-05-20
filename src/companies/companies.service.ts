@@ -9,6 +9,7 @@ import {
     UsersRepository,
 } from 'src/common/repositories';
 import { SchedulesService } from 'src/schedules/schedules.service';
+import { SocketService } from 'src/socket/socket.service';
 import { DeepPartial } from 'typeorm';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyProfileDto } from './dto/update-company-profile.dto';
@@ -24,6 +25,7 @@ export class CompaniesService {
         private readonly usersRepository: UsersRepository,
         private readonly schedulesService: SchedulesService,
         private readonly schedulesRepository: SchedulesRepository,
+        private readonly socketService: SocketService,
         private readonly categoriesRepository: CategoriesRepository
     ) {}
 
@@ -115,13 +117,13 @@ export class CompaniesService {
 
     // ============================================ Update company profile
 
-    async updateProfile(id: number, data: UpdateCompanyProfileDto) {
+    async updateProfile(id: number, data: UpdateCompanyProfileDto, userId: number) {
         const isExist = await this.companyRepository.findOneBy({ id });
 
         if (!isExist) {
             throw new BadRequestException(`Company with id "${id}" not found`);
         }
-        const { activities, category, ...filteredData } = data;
+        let { activities, category, ...filteredData } = data;
 
         if (activities) {
             isExist.activities = activities.map(id => ({ id })) as Activity[];
@@ -215,7 +217,33 @@ export class CompaniesService {
             }
         }
 
-        return await this.companyRepository.update(id, filteredData);
+        const update = await this.companyRepository.update(id, filteredData);
+
+        if (activities) {
+            const company = await this.companyRepository.findOne({
+                where: { id: isExist.id },
+                relations: ['activities'],
+                select: { activities: { id: true, name: true } },
+            });
+
+            filteredData = Object.assign(filteredData, { activities: company.activities });
+        }
+
+        if (category) {
+            const company = await this.companyRepository.findOne({
+                where: { id: isExist.id },
+                relations: ['category'],
+                select: ['category'],
+            });
+
+            filteredData = Object.assign(filteredData, { category: company.category });
+        }
+
+        if (update) {
+            await this.socketService.broadcastEvent(userId, 'company:update', filteredData);
+        }
+
+        return update;
     }
 
     // ============================================ Update company avatar
