@@ -103,3 +103,21 @@ export type IBasicServiceInfo = Pick<
 export type ChannelData = Omit<Channel, 'users'> & {
     users: number[];
 };
+
+export type EventTime = {
+    from: string;
+    to: string;
+};
+
+export type EventDataType = {
+    id: number;
+    year: number;
+    month: number;
+    day: number;
+    time: EventTime;
+    duration: number;
+    comments: string | null;
+    employee: { id: number };
+    client: { id: number };
+    services: { id: number }[];
+};

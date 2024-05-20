@@ -14,6 +14,7 @@ import { RequestLoggingMiddleware } from './common/middleware/logging.middleware
 import { CompaniesModule } from './companies/companies.module';
 import { EmailModule } from './email/email.module';
 import { EmployeesModule } from './employees/employees.module';
+import { EventsModule } from './events/events.module';
 import { ProductsModule } from './products/products.module';
 import { ResourcesModule } from './resources/resources.module';
 import { SchedulesModule } from './schedules/schedules.module';
@@ -40,6 +41,7 @@ import { UsersModule } from './users/users.module';
         ActionsModule,
         CloudinaryModule,
         SocketModule,
+        EventsModule,
     ],
     controllers: [],
 

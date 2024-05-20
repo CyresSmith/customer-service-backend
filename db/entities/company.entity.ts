@@ -14,13 +14,14 @@ import {
 import { Action } from './action.entity';
 import { Activity } from './activity.entity';
 import { Category } from './category.entity';
+import { Channel } from './channel.entity';
 import { Client } from './client.entity';
 import { Employee } from './employee.entity';
+import { Event } from './event.entity';
 import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
 import { ServiceCategory } from './serviceCategory.entity';
-import { Channel } from './channel.entity';
 
 @Entity({ name: 'Company' })
 export class Company {
@@ -102,6 +103,9 @@ export class Company {
 
     @OneToMany(() => Channel, channel => channel.company)
     channels: Channel[];
+
+    @OneToMany(() => Event, event => event.company)
+    events: Event[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

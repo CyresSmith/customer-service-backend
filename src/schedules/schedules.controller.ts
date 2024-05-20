@@ -107,6 +107,17 @@ export class SchedulesController {
 
     // ==========================================================
 
+    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+    @UseGuards(AccessTokenGuard, RolesGuard)
+    @Get(':employeeId/get-all')
+    @HttpCode(200)
+    async getEmployeeAllSchedules(
+        @Query('companyId') companyId: number,
+        @Param('employeeId') employeeId: number
+    ): Promise<Schedule[]> {
+        return await this.schedulesService.getEmployeeAllSchedules(companyId, employeeId);
+    }
+
     // @Post()
     // create(@Body() createScheduleDto: CreateScheduleDto) {
     //   return this.schedulesService.create(createScheduleDto);

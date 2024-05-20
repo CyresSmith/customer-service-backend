@@ -9,3 +9,4 @@ export { MessagesRepository } from './messages.repository';
 export { SchedulesRepository } from './schedules.repository';
 export { ServicesRepository } from './services.repository';
 export { UsersRepository } from './users.repository';
+export { EventsRepository } from './events.repository';
