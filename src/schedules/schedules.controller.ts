@@ -9,14 +9,14 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { SchedulesService } from './schedules.service';
+import { Schedule } from 'db/entities';
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
-import { UpdateEmployeeScheduleDto } from 'src/companies/dto/update-employee-schedule.dto';
 import { MessageResponse } from 'src/common/types';
+import { UpdateEmployeeScheduleDto } from 'src/companies/dto/update-employee-schedule.dto';
 import { EmployeesService } from 'src/employees/employees.service';
-import { Schedule } from 'db/entities';
+import { SchedulesService } from './schedules.service';
 
 @Controller('schedules')
 export class SchedulesController {
@@ -47,7 +47,7 @@ export class SchedulesController {
         @Query('companyId') companyId: number,
         @Param('employeeId') employeeId: number,
         @Body() data: UpdateEmployeeScheduleDto
-    ): Promise<MessageResponse> {
+    ): Promise<MessageResponse & { scheduleId: number }> {
         await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
         const existSchedule = await this.schedulesService.getEmployeeSchedule(
@@ -67,7 +67,7 @@ export class SchedulesController {
             });
         }
 
-        return { message: 'Графік оновлено' };
+        return { message: 'Графік оновлено', scheduleId: existSchedule.id };
     }
 
     // ============================================ Get employee schedule
