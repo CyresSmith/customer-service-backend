@@ -50,6 +50,8 @@ export class SchedulesController {
     ): Promise<MessageResponse & { scheduleId: number }> {
         await this.employeesService.checkCompanyEmployee(companyId, employeeId);
 
+        let scheduleId: number;
+
         const existSchedule = await this.schedulesService.getEmployeeSchedule(
             companyId,
             employeeId,
@@ -58,16 +60,22 @@ export class SchedulesController {
         );
 
         if (existSchedule) {
+            scheduleId = existSchedule.id;
             await this.schedulesService.updateScheduleById(existSchedule.id, data.schedule);
         } else {
-            await this.schedulesService.createEmployeeSchedule({
+            const newSchedule = await this.schedulesService.createEmployeeSchedule({
                 ...data,
                 companyId,
                 employeeId,
             });
+
+            scheduleId = newSchedule.id;
         }
 
-        return { message: 'Графік оновлено', scheduleId: existSchedule.id };
+        return {
+            message: 'Графік оновлено',
+            scheduleId,
+        };
     }
 
     // ============================================ Get employee schedule
