@@ -53,6 +53,19 @@ export class ServicesController {
         return await this.servicesService.getServices(companyId);
     }
 
+    // ============================================ Get Employee services
+
+    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.EMPLOYEE)
+    @UseGuards(AccessTokenGuard, RolesGuard)
+    @Get('employee')
+    @HttpCode(200)
+    async getEmployeeServices(
+        @Query('companyId') companyId: number,
+        @Query('employeeId') employeeId: number
+    ): Promise<IBasicServiceInfo[]> {
+        return await this.servicesService.getServices(companyId, employeeId);
+    }
+
     // ============================================ Update service avatar
 
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)

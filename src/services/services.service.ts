@@ -69,9 +69,15 @@ export class ServicesService {
 
     // ============================================ get company services
 
-    async getServices(companyId: number): Promise<IBasicServiceInfo[]> {
+    async getServices(companyId: number, employeeId?: number): Promise<IBasicServiceInfo[]> {
+        let where = { company: { id: companyId } };
+
+        if (employeeId) {
+            where = Object.assign(where, { employees: { id: employeeId } });
+        }
+
         return await this.servicesRepository.find({
-            where: { company: { id: companyId } },
+            where,
             relations: ['category'],
             select: {
                 id: true,

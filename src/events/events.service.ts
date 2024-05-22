@@ -40,18 +40,26 @@ export class EventsService {
             },
             relations: ['employee', 'client', 'services'],
             select: {
-                services: { id: true, name: true },
+                services: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    employeesSettings: true,
+                    duration: true,
+                },
                 employee: {
                     id: true,
                     firstName: true,
                     lastName: true,
                     jobTitle: true,
+                    avatar: true,
                 },
                 client: {
                     id: true,
                     firstName: true,
                     lastName: true,
                     phone: true,
+                    avatar: true,
                 },
             },
         });

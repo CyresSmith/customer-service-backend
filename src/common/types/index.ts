@@ -1,4 +1,4 @@
-import { Channel, Resource } from 'db/entities';
+import { Channel, Client, Employee, Resource, Service } from 'db/entities';
 import { IBasicServiceCategoryInfo } from 'src/categories/categories.types';
 import { IBasicEmployeeInfo } from 'src/employees/employees.types';
 import { IBasicUserInfo } from 'src/users/users.types';
@@ -117,7 +117,7 @@ export type EventDataType = {
     time: EventTime;
     duration: number;
     comments: string | null;
-    employee: { id: number };
-    client: { id: number };
-    services: { id: number }[];
+    employee: Pick<Employee, 'id' | 'firstName' | 'lastName' | 'jobTitle' | 'avatar'>;
+    client: Pick<Client, 'id' | 'firstName' | 'lastName' | 'phone' | 'avatar'>;
+    services: Pick<Service, 'id' | 'name' | 'price' | 'employeesSettings' | 'duration'>[];
 };
