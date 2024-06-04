@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Company } from './company.entity';
 import { Event } from './event.entity';
+import { Transaction } from './transaction.entity';
 
 @Entity({ name: 'Client' })
 export class Client {
@@ -53,6 +54,13 @@ export class Client {
         nullable: true,
     })
     events: Event[];
+
+    @OneToMany(() => Transaction, transactions => transactions.client, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    transactions: Transaction[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

@@ -13,11 +13,13 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Action } from './action.entity';
+import { Cashbox } from './cashbox.entity';
 import { Company } from './company.entity';
+import { Event } from './event.entity';
 import { Schedule } from './schedule.entity';
 import { Service } from './service.entity';
+import { Transaction } from './transaction.entity';
 import { User } from './user.entity';
-import { Event } from './event.entity';
 
 @Entity({ name: 'Employee' })
 export class Employee {
@@ -104,6 +106,16 @@ export class Employee {
         nullable: true,
     })
     events: Event[];
+
+    @OneToMany(() => Transaction, transactions => transactions.client, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    transactions: Transaction[];
+
+    @OneToMany(() => Cashbox, cashbox => cashbox.id)
+    cashboxes: Cashbox[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

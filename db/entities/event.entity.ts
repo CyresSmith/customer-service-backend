@@ -1,3 +1,4 @@
+import { EventTime } from 'src/common/types';
 import {
     Column,
     CreateDateColumn,
@@ -7,14 +8,15 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { Client } from './client.entity';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Service } from './service.entity';
-import { Client } from './client.entity';
-import { EventTime } from 'src/common/types';
+import { Transaction } from './transaction.entity';
 
 @Entity({ name: 'Event' })
 export class Event {
@@ -66,12 +68,6 @@ export class Event {
     @Column({ nullable: false })
     day: number;
 
-    // @Column({ nullable: false })
-    // from: string;
-
-    // @Column({ nullable: false })
-    // to: string;
-
     @Column({
         type: 'jsonb',
     })
@@ -82,6 +78,13 @@ export class Event {
 
     @Column({ nullable: true, default: '' })
     comments: string;
+
+    @OneToOne(() => Transaction, transaction => transaction.event, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    transaction: Transaction;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

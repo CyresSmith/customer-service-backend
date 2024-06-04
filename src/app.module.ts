@@ -21,6 +21,9 @@ import { SchedulesModule } from './schedules/schedules.module';
 import { ServicesModule } from './services/services.module';
 import { SocketModule } from './socket/socket.module';
 import { UsersModule } from './users/users.module';
+import { CashboxModule } from './cashbox/cashbox.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { TransactionCategoryModule } from './transaction-category/transaction-category.module';
 
 @Module({
     imports: [
@@ -42,6 +45,9 @@ import { UsersModule } from './users/users.module';
         CloudinaryModule,
         SocketModule,
         EventsModule,
+        CashboxModule,
+        TransactionModule,
+        TransactionCategoryModule,
     ],
     controllers: [],
 

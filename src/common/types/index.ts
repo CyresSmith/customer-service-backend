@@ -121,3 +121,5 @@ export type EventDataType = {
     client: Pick<Client, 'id' | 'firstName' | 'lastName' | 'phone' | 'avatar'>;
     services: Pick<Service, 'id' | 'name' | 'price' | 'employeesSettings' | 'duration'>[];
 };
+
+export type TransactionType = 'income' | 'expense';

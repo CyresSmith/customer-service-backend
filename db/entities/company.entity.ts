@@ -22,6 +22,7 @@ import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
 import { ServiceCategory } from './serviceCategory.entity';
+import { Cashbox } from './cashbox.entity';
 
 @Entity({ name: 'Company' })
 export class Company {
@@ -106,6 +107,9 @@ export class Company {
 
     @OneToMany(() => Event, event => event.company)
     events: Event[];
+
+    @OneToMany(() => Cashbox, cashbox => cashbox.company)
+    cashboxes: Cashbox[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
