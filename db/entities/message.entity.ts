@@ -3,6 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     Index,
+    JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -23,6 +24,7 @@ export class Message {
 
     @Index()
     @ManyToOne(() => Channel, channel => channel.messages)
+    @JoinColumn({ name: 'channelId' })
     channel: Channel;
 
     @Column({ nullable: false })

@@ -30,6 +30,7 @@ export class Schedule {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
+    @JoinColumn({ name: 'employeeId' })
     employee: Employee;
 
     @ManyToOne(() => Resource, resource => resource.schedules)

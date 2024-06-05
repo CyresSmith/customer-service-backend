@@ -3,6 +3,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
+    JoinColumn,
     ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn,
@@ -37,7 +39,10 @@ export class Transaction {
     @ManyToOne(() => Cashbox, cashbox => cashbox.transactions, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        nullable: false,
     })
+    @JoinColumn({ name: 'cashboxId' })
+    @Index()
     cashbox: Cashbox;
 
     @ManyToOne(() => Client, client => client.transactions, {
@@ -54,6 +59,15 @@ export class Transaction {
     })
     employee: Employee;
 
+    @ManyToOne(() => Employee, employee => employee.operations, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: false,
+    })
+    @JoinColumn({ name: 'creatorId' })
+    @Index()
+    creator: Employee;
+
     @OneToOne(() => Event, event => event.transaction, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -67,7 +81,10 @@ export class Transaction {
     @ManyToOne(() => TransactionCategory, transactionCategory => transactionCategory.transactions, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        nullable: false,
     })
+    @JoinColumn({ name: 'categoryId' })
+    @Index()
     category: TransactionCategory;
 
     @Column({ nullable: true, default: '' })

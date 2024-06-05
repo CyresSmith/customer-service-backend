@@ -35,6 +35,7 @@ export class Action {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
     })
+    @JoinColumn({ name: 'employeeId' })
     employee: Employee;
 
     @ManyToMany(() => Resource, resource => resource.actions)

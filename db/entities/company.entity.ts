@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { Action } from './action.entity';
 import { Activity } from './activity.entity';
+import { Cashbox } from './cashbox.entity';
 import { Category } from './category.entity';
 import { Channel } from './channel.entity';
 import { Client } from './client.entity';
@@ -22,7 +23,6 @@ import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
 import { ServiceCategory } from './serviceCategory.entity';
-import { Cashbox } from './cashbox.entity';
 
 @Entity({ name: 'Company' })
 export class Company {

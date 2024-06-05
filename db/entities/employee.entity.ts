@@ -114,6 +114,13 @@ export class Employee {
     })
     transactions: Transaction[];
 
+    @OneToMany(() => Transaction, transactions => transactions.creator, {
+        onDelete: 'NO ACTION',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    operations: Transaction[];
+
     @OneToMany(() => Cashbox, cashbox => cashbox.id)
     cashboxes: Cashbox[];
 

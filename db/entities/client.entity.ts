@@ -4,6 +4,7 @@ import {
     CreateDateColumn,
     Entity,
     Index,
+    JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
@@ -70,5 +71,6 @@ export class Client {
 
     @ManyToOne(() => Company, company => company.clients)
     @Index()
+    @JoinColumn({ name: 'companyId' })
     company: Company;
 }

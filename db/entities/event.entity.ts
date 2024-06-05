@@ -36,6 +36,7 @@ export class Event {
         onUpdate: 'CASCADE',
         nullable: false,
     })
+    @JoinColumn({ name: 'clientId' })
     client: Client;
 
     @ManyToOne(() => Employee, employee => employee.id, {
@@ -43,6 +44,7 @@ export class Event {
         onUpdate: 'CASCADE',
         nullable: false,
     })
+    @JoinColumn({ name: 'employeeId' })
     employee: Employee;
 
     @ManyToMany(() => Service, service => service.events)

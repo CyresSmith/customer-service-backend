@@ -12,9 +12,9 @@ import {
 } from 'typeorm';
 import { Company } from './company.entity';
 import { Employee } from './employee.entity';
+import { Event } from './event.entity';
 import { Resource } from './resource.entity';
 import { ServiceCategory } from './serviceCategory.entity';
-import { Event } from './event.entity';
 
 @Entity({ name: 'Service' })
 export class Service {

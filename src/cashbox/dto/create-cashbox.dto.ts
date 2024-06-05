@@ -13,6 +13,6 @@ export class CreateCashboxDto {
 
     @IsOptional()
     @IsString()
-    @Length(10, 50)
+    @Length(10, 150)
     comment: string;
 }

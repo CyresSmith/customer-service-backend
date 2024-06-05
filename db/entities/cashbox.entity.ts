@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
@@ -27,6 +28,7 @@ export class Cashbox {
         onUpdate: 'CASCADE',
         nullable: false,
     })
+    @JoinColumn({ name: 'responsibleId' })
     responsible: Employee;
 
     @Column({ nullable: false, default: '' })
@@ -37,6 +39,7 @@ export class Cashbox {
         onUpdate: 'CASCADE',
         nullable: false,
     })
+    @JoinColumn({ name: 'companyId' })
     company: Company;
 
     @OneToMany(() => Transaction, transaction => transaction.cashbox, {

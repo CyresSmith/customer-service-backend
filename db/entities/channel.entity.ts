@@ -2,6 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     ManyToOne,
@@ -44,6 +45,7 @@ export class Channel {
     users: User[];
 
     @ManyToOne(() => Company, company => company.channels)
+    @JoinColumn({ name: 'companyId' })
     company: Company;
 
     @OneToMany(() => Message, message => message.channel)

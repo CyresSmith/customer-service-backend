@@ -122,4 +122,4 @@ export type EventDataType = {
     services: Pick<Service, 'id' | 'name' | 'price' | 'employeesSettings' | 'duration'>[];
 };
 
-export type TransactionType = 'income' | 'expense';
+export type TransactionType = 'income' | 'expense' | 'moving' | 'change';
