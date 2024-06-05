@@ -29,9 +29,13 @@ export class Cashbox {
     })
     responsible: Employee;
 
+    @Column({ nullable: false, default: '' })
+    comment: string;
+
     @ManyToOne(() => Company, company => company.cashboxes, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
+        nullable: false,
     })
     company: Company;
 
@@ -42,7 +46,7 @@ export class Cashbox {
     transactions: Transaction[];
 
     @Column({ nullable: false, default: true })
-    isOpen: boolean;
+    isActive: boolean;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

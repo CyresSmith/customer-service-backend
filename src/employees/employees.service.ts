@@ -39,6 +39,7 @@ export class EmployeesService {
                 avatar: true,
                 services: { id: true },
                 provider: true,
+                role: true,
                 user: {
                     firstName: true,
                     lastName: true,
