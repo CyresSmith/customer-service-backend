@@ -19,6 +19,8 @@ export class CashboxService {
         private readonly employeesRepository: EmployeesRepository
     ) {}
 
+    // ================================= Create Cashbox
+
     async create(dto: CreateCashboxDto, companyId: number): Promise<CashboxBasicInfo> {
         const isEmployeeExist = await this.employeesRepository.findOneBy({
             id: dto.responsible,
@@ -52,6 +54,8 @@ export class CashboxService {
         };
     }
 
+    // ================================= Find All Cashbox
+
     async findAll(id: number): Promise<CashboxBasicInfo[]> {
         return await this.cashboxRepository.find({
             where: { company: { id } },
@@ -67,6 +71,8 @@ export class CashboxService {
             relations: ['responsible'],
         });
     }
+
+    // ================================= Find one Cashbox
 
     async findOne(companyId: number, id: number) {
         return await this.cashboxRepository.findOne({
@@ -84,6 +90,8 @@ export class CashboxService {
             relations: ['responsible'],
         });
     }
+
+    // ================================= Update Cashbox
 
     async update(companyId: number, id: number, dto: UpdateCashboxDto): Promise<MessageResponse> {
         const isExist = await this.cashboxRepository.findOneBy({ id, company: { id: companyId } });
@@ -105,6 +113,46 @@ export class CashboxService {
 
         return { message: `Каса "${isExist.name}" оновлено` };
     }
+
+    // ================================= Change Cashbox Balance
+
+    async changeBalance(companyId: number, id: number, balance: number): Promise<MessageResponse> {
+        const isExist = await this.cashboxRepository.findOneBy({ id, company: { id: companyId } });
+
+        if (!isExist) throw new NotFoundException('Касу не знайдено');
+
+        const update = await this.cashboxRepository.update(
+            { id, company: { id: companyId } },
+            { balance }
+        );
+
+        if (!update) {
+            throw new ServiceUnavailableException('Щось пішло не так :(');
+        }
+
+        return { message: `Баланс "${isExist.name}" оновлено` };
+    }
+
+    // ================================= Update Cashbox Balance
+
+    async updateBalance(companyId: number, id: number, amount: number): Promise<MessageResponse> {
+        const isExist = await this.cashboxRepository.findOneBy({ id, company: { id: companyId } });
+
+        if (!isExist) throw new NotFoundException('Касу не знайдено');
+
+        const update = await this.cashboxRepository.update(
+            { id, company: { id: companyId } },
+            { balance: (isExist.balance += amount) }
+        );
+
+        if (!update) {
+            throw new ServiceUnavailableException('Щось пішло не так :(');
+        }
+
+        return { message: `Баланс "${isExist.name}" оновлено` };
+    }
+
+    // ================================= Remove Cashbox
 
     async remove(companyId: number, id: number): Promise<MessageResponse> {
         const isExist = await this.cashboxRepository.findOne({

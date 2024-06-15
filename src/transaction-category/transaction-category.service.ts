@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { TransactionCategoryRepository } from 'src/common/repositories';
 import { CreateTransactionCategoryDto } from './dto/create-transaction-category.dto';
 import { UpdateTransactionCategoryDto } from './dto/update-transaction-category.dto';
 
 @Injectable()
 export class TransactionCategoryService {
-  create(createTransactionCategoryDto: CreateTransactionCategoryDto) {
-    return 'This action adds a new transactionCategory';
-  }
+    constructor(private readonly transactionCategoryRepository: TransactionCategoryRepository) {}
 
-  findAll() {
-    return `This action returns all transactionCategory`;
-  }
+    async create(dto: CreateTransactionCategoryDto) {
+        const newCategory = this.transactionCategoryRepository.create({ ...dto });
 
-  findOne(id: number) {
-    return `This action returns a #${id} transactionCategory`;
-  }
+        return await this.transactionCategoryRepository.save(newCategory);
+    }
 
-  update(id: number, updateTransactionCategoryDto: UpdateTransactionCategoryDto) {
-    return `This action updates a #${id} transactionCategory`;
-  }
+    async findAll() {
+        return await this.transactionCategoryRepository.find();
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} transactionCategory`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} transactionCategory`;
+    }
+
+    update(id: number, updateTransactionCategoryDto: UpdateTransactionCategoryDto) {
+        return `This action updates a #${id} transactionCategory`;
+    }
+
+    remove(id: number) {
+        return `This action removes a #${id} transactionCategory`;
+    }
 }

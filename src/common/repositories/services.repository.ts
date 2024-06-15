@@ -34,4 +34,19 @@ export class ServicesRepository extends Repository<Service> {
             },
         });
     }
+
+    // ============================================ Get Price
+
+    async getPrice(id: number): Promise<number> {
+        const service = await this.findOne({
+            where: {
+                id,
+            },
+            select: ['price'],
+        });
+
+        if (service) {
+            return service.price;
+        }
+    }
 }

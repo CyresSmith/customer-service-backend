@@ -23,6 +23,8 @@ import { Product } from './product.entity';
 import { Resource } from './resource.entity';
 import { Service } from './service.entity';
 import { ServiceCategory } from './serviceCategory.entity';
+import { Transaction } from './transaction.entity';
+import { TransactionCategory } from './transaction-category.entity';
 
 @Entity({ name: 'Company' })
 export class Company {
@@ -110,6 +112,12 @@ export class Company {
 
     @OneToMany(() => Cashbox, cashbox => cashbox.company)
     cashboxes: Cashbox[];
+
+    @OneToMany(() => TransactionCategory, transactionCategory => transactionCategory.company)
+    transactionCategories: TransactionCategory[];
+
+    @OneToMany(() => Transaction, transaction => transaction.company)
+    transactions: Transaction[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

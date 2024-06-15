@@ -12,13 +12,19 @@ import {
 import { Roles } from 'src/common/decorators';
 import { RolesEnum } from 'src/common/enums';
 import { AccessTokenGuard, RolesGuard } from 'src/common/guards';
+import { TransactionService } from 'src/transaction/transaction.service';
 import { CashboxService } from './cashbox.service';
 import { CreateCashboxDto } from './dto/create-cashbox.dto';
 import { UpdateCashboxDto } from './dto/update-cashbox.dto';
 
 @Controller('cashbox')
 export class CashboxController {
-    constructor(private readonly cashboxService: CashboxService) {}
+    constructor(
+        private readonly cashboxService: CashboxService,
+        private readonly transactionService: TransactionService
+    ) {}
+
+    // ================================= Create Cashbox
 
     @Roles(RolesEnum.OWNER)
     @UseGuards(AccessTokenGuard, RolesGuard)
@@ -30,6 +36,8 @@ export class CashboxController {
         return await this.cashboxService.create(createCashboxDto, companyId);
     }
 
+    // ================================= Get All Cashboxes
+
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
     @UseGuards(AccessTokenGuard, RolesGuard)
     @Get()
@@ -37,12 +45,16 @@ export class CashboxController {
         return await this.cashboxService.findAll(companyId);
     }
 
+    // ================================= Get Bi Id
+
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
     @UseGuards(AccessTokenGuard, RolesGuard)
     @Get(':id')
     findOne(@Query('companyId') companyId: number, @Param('id') id: number) {
         return this.cashboxService.findOne(companyId, id);
     }
+
+    // ================================= Update Bi Id
 
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
     @UseGuards(AccessTokenGuard, RolesGuard)
@@ -54,6 +66,8 @@ export class CashboxController {
     ) {
         return this.cashboxService.update(companyId, id, updateCashboxDto);
     }
+
+    // ================================= Delete
 
     @Roles(RolesEnum.OWNER)
     @UseGuards(AccessTokenGuard, RolesGuard)

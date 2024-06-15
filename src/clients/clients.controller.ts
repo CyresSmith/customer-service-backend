@@ -1,26 +1,26 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Param,
-    Delete,
-    UseGuards,
-    HttpCode,
-    ConflictException,
-    UseInterceptors,
-    UploadedFile,
-    Patch,
     BadRequestException,
+    Body,
+    ConflictException,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    Param,
+    Patch,
+    Post,
     Query,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Client } from 'db/entities';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { AccessTokenGuard } from 'src/common/guards';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { AccessTokenGuard } from 'src/common/guards';
-import { Client } from 'db/entities';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Controller('clients')
 export class ClientsController {

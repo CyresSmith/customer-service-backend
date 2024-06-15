@@ -100,14 +100,14 @@ export class Employee {
     })
     services: Service[];
 
-    @ManyToMany(() => Event, event => event.employee, {
+    @OneToMany(() => Event, event => event.employee, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         nullable: true,
     })
     events: Event[];
 
-    @OneToMany(() => Transaction, transactions => transactions.client, {
+    @ManyToMany(() => Transaction, transactions => transactions.employees, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         nullable: true,

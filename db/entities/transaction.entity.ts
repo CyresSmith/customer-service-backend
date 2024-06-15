@@ -5,13 +5,16 @@ import {
     Entity,
     Index,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     ManyToOne,
-    OneToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import { Cashbox } from './cashbox.entity';
 import { Client } from './client.entity';
+import { Company } from './company.entity';
 import { Employee } from './employee.entity';
 import { Event } from './event.entity';
 import { TransactionCategory } from './transaction-category.entity';
@@ -31,10 +34,19 @@ export class Transaction {
     day: number;
 
     @Column({ nullable: false })
-    time: string;
+    time: number;
 
     @Column({ nullable: false })
     amount: number;
+
+    @ManyToOne(() => Company, company => company.transactions, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: false,
+    })
+    @JoinColumn({ name: 'companyId' })
+    @Index()
+    company: Company;
 
     @ManyToOne(() => Cashbox, cashbox => cashbox.transactions, {
         onDelete: 'CASCADE',
@@ -45,6 +57,15 @@ export class Transaction {
     @Index()
     cashbox: Cashbox;
 
+    @ManyToOne(() => Cashbox, cashbox => cashbox.incomingMovement, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        nullable: true,
+    })
+    @JoinColumn({ name: 'toCashboxId' })
+    @Index()
+    toCashboxId: Cashbox;
+
     @ManyToOne(() => Client, client => client.transactions, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -52,12 +73,19 @@ export class Transaction {
     })
     client: Client;
 
-    @ManyToOne(() => Employee, employee => employee.transactions, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-        nullable: true,
+    @ManyToMany(() => Employee, employee => employee.transactions)
+    @JoinTable({
+        name: 'transactions_employees',
+        joinColumn: {
+            name: 'transactionId',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'employeeId',
+            referencedColumnName: 'id',
+        },
     })
-    employee: Employee;
+    employees: Employee[];
 
     @ManyToOne(() => Employee, employee => employee.operations, {
         onDelete: 'CASCADE',
@@ -68,12 +96,12 @@ export class Transaction {
     @Index()
     creator: Employee;
 
-    @OneToOne(() => Event, event => event.transaction, {
-        onDelete: 'CASCADE',
+    @OneToMany(() => Event, event => event.transaction, {
+        onDelete: 'NO ACTION',
         onUpdate: 'CASCADE',
         nullable: true,
     })
-    event: Event;
+    events: Event[];
 
     @Column({ nullable: false })
     type: TransactionType;

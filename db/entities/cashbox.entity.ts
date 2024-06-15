@@ -48,6 +48,12 @@ export class Cashbox {
     })
     transactions: Transaction[];
 
+    @OneToMany(() => Transaction, transaction => transaction.toCashboxId, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    incomingMovement: Transaction[];
+
     @Column({ nullable: false, default: true })
     isActive: boolean;
 

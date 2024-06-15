@@ -8,7 +8,6 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -23,7 +22,7 @@ export class Event {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Company, company => company.id, {
+    @ManyToOne(() => Company, company => company.events, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
     })
@@ -31,7 +30,7 @@ export class Event {
     @Index()
     company: Company;
 
-    @ManyToOne(() => Client, client => client.id, {
+    @ManyToOne(() => Client, client => client.events, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         nullable: false,
@@ -39,7 +38,7 @@ export class Event {
     @JoinColumn({ name: 'clientId' })
     client: Client;
 
-    @ManyToOne(() => Employee, employee => employee.id, {
+    @ManyToOne(() => Employee, employee => employee.events, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         nullable: false,
@@ -78,10 +77,13 @@ export class Event {
     @Column({ nullable: false })
     duration: number;
 
+    @Column({ nullable: false, default: 0 })
+    amount: number;
+
     @Column({ nullable: true, default: '' })
     comments: string;
 
-    @OneToOne(() => Transaction, transaction => transaction.event, {
+    @ManyToOne(() => Transaction, transaction => transaction.events, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         nullable: true,

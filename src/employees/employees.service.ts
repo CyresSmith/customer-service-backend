@@ -55,7 +55,7 @@ export class EmployeesService {
             firstName: firstName || user.firstName,
             lastName: lastName || user.lastName,
             avatar: avatar || user.avatar,
-            servicesCount: services.length,
+            services: services.map(({ id }) => id),
             userId: user.id,
             isOnline: user.isOnline,
         }));

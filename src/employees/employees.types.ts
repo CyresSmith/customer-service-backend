@@ -17,7 +17,7 @@ export interface IBasicEmployeeInfo
 
 export interface IBasicEmployee
     extends Pick<Employee, 'id' | 'avatar' | 'firstName' | 'lastName' | 'status' | 'jobTitle'> {
-    servicesCount: number;
+    services: number[];
     userId: number;
     isOnline: boolean;
 }
