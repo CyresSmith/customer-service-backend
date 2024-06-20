@@ -7,7 +7,7 @@ import {
     TransactionRepository,
 } from 'src/common/repositories';
 import { TransactionType } from 'src/common/types';
-import { In } from 'typeorm';
+import { Between, In } from 'typeorm';
 import { ChangeBalanceDto } from './dto/change-balance.dto';
 import { MovingTransactionDto } from './dto/moving-transaction.dto';
 import { PurchaseTransactionDto } from './dto/purchase-transaction.dto';
@@ -200,7 +200,12 @@ export class TransactionService {
 
         const currentBalance = (await this.cashboxService.findOne(companyId, cashbox)).balance;
 
-        const amount = balance - currentBalance;
+        const amount =
+            balance > currentBalance
+                ? balance - currentBalance
+                : balance < currentBalance
+                  ? currentBalance - balance
+                  : balance;
 
         const transactionData = {
             ...data,
@@ -232,6 +237,24 @@ export class TransactionService {
         time: number;
     }) {
         return await this.transactionRepository.find({ where, order: { createdAt: 'DESC' } });
+    }
+
+    // ================================= Find Period
+
+    async findPeriod(companyId: number, period: { from: string; to: string }) {
+        const from = new Date(period.from);
+        const to = new Date(period.to);
+
+        const data = await this.transactionRepository.find({
+            where: {
+                company: { id: companyId },
+                createdAt: Between(from, to),
+            },
+            relations: ['category', 'cashbox'],
+            order: { createdAt: 'DESC' },
+        });
+
+        return data;
     }
 
     findOne(id: number) {

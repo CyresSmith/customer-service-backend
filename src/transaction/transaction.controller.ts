@@ -47,6 +47,19 @@ export class TransactionController {
         });
     }
 
+    // ================================= Get Transactions Period
+
+    @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
+    @UseGuards(AccessTokenGuard, RolesGuard)
+    @Get('/period')
+    async findPeriod(
+        @Query('companyId') companyId: number,
+        @Query('from') from: string,
+        @Query('to') to: string
+    ) {
+        return await this.transactionService.findPeriod(companyId, { from, to });
+    }
+
     // ================================= Get Transaction By Id
 
     @Roles(RolesEnum.OWNER, RolesEnum.ADMIN)
